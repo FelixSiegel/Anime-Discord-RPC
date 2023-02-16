@@ -12,7 +12,6 @@ from pypresence import Presence
 import time
 from flask import *
 from flask_cors import CORS
-import json, os, signal
 
 CLIENT_ID = "1020359247059497071"
 app = Flask(__name__)
@@ -55,17 +54,12 @@ def rpc_anime():
         response_data = jsonify({'processed': 'true'})
         return response_data
     return render_template('rpc_anime.html')
-
-@app.route('/exit')
-def shut_down():
-    os.kill(os.getpid(), signal.SIGINT)
-    return render_template('shut_down.html')
   
 if __name__ =='__main__':  
     print("\033[92m[INFO]:\033[00m Connect to Discord RPC")
     RPC.connect()
     print("\033[92m[INFO]:\033[00m Start Flask server on port 8000")
-    app.run(debug = True, port=8000)
+    app.run(port=8000)
     print("\033[91m[STOPPED]:\033[00m Shutdown Server", file=sys.stdout)
     RPC.close()
     print("\033[91m[STOPPED]:\033[00m Closed connection to Discord Gateway", file=sys.stdout)
