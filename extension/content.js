@@ -2,16 +2,29 @@ window.onload = ()=>{
     console.log(document.location.host)
     if (document.location.host == "aniworld.to") {
         console.clear()
-        console.log(document.getElementsByClassName("inSiteWebStream"))
+        console.log("inSiteWebStream: ", document.getElementsByClassName("inSiteWebStream"))
         streamBox = document.getElementsByClassName("inSiteWebStream")
         if (streamBox.length > 0) {
             infos = document.getElementsByClassName("hosterSiteTitle")[0]
             if (infos.getAttribute("data-season") != "0") { // if season is selected, not film
-                console.log("Anime: ", document.getElementsByClassName("series-title")[0].children[0].innerText)
-                console.log("Season: ", infos.getAttribute("data-season"))
-                console.log("Cur Episode: ", document.getElementsByClassName("active")[1].innerText)
-                console.log("Max Episode: ", document.getElementsByClassName("active")[1].parentElement.parentElement.childElementCount -1)
+                var anime = document.getElementsByClassName("series-title")[0].children[0].innerText;
+                    season = infos.getAttribute("data-season");
+                    cur_ep = document.getElementsByClassName("active")[1].innerText;
+                    max_ep = document.getElementsByClassName("active")[1].parentElement.parentElement.childElementCount -1;
+                console.log("Anime: ", anime);console.log("Season: ", season);
+                console.log("Cur Episode: ", cur_ep);console.log("Max Episode: ", max_ep);
 
+                // save streaming data to local-storage for sync-function of popup.js
+                browser.storage.local.set(
+                    {
+                        "cur_stream_data": {
+                            "anime": anime,
+                            "cur_ep": cur_ep,
+                            "tot_ep": max_ep,
+                            "season": season
+                        }
+                    }
+                )
 
                 // check every 5 seconds if audio is playing
                 let last_stand = false
@@ -28,8 +41,8 @@ window.onload = ()=>{
                                         "args": { 
                                             "type": "update",
                                             "host": "aniworld", 
-                                            "details": document.getElementsByClassName("series-title")[0].children[0].innerText, 
-                                            "state": `Episode (${document.getElementsByClassName("active")[1].innerText} of ${document.getElementsByClassName("active")[1].parentElement.parentElement.childElementCount -1}), Season ${document.getElementsByClassName("hosterSiteTitle")[0].getAttribute("data-season")}`,
+                                            "details": anime, 
+                                            "state": `Episode (${cur_ep} of ${max_ep}), Season ${season}`,
                                             "anilist": url.anilist
                                         }
                                     })

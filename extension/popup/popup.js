@@ -66,8 +66,7 @@ function storage_err(err) {
     console.log(`Error: ${err}`)
 }
 
-// update rpc with values from input (maybe last session values)
-window.onload = ()=>{
+function update_session() {
     browser.storage.local.get('hostname').then((item)=>{change_host(document.getElementById(item.hostname), storage_update=true)}, storage_err)
     browser.storage.local.get('anime').then((item)=>{update_from_storage("anime_input", item.anime)}, storage_err)
     browser.storage.local.get('curepisode').then((item)=>{update_from_storage("cur_ep_inp", item.curepisode)}, storage_err)
@@ -76,9 +75,12 @@ window.onload = ()=>{
     browser.storage.local.get('anilist').then((item)=>{update_from_storage("anilist_link", item.anilist)}, storage_err)
 }
 
+// update rpc with values from input (maybe last session values)
+window.onload = update_session
+
 // Button event handling
 
-document.getElementById("stop_btn").addEventListener("click", (e)=>{
+document.getElementById("stop_btn").addEventListener("click", ()=>{
     datas = { 
         "type": "clear"
     }
@@ -96,6 +98,28 @@ document.getElementById("stop_btn").addEventListener("click", (e)=>{
         }
     )
 })
+
+
+// Function for sync data from current stream with data from local-storage
+document.getElementById("sync_btn").addEventListener("click", ()=>{
+    browser.storage.local.get('cur_stream_data').then(
+        (item) => {
+            // if item is empty
+            if (Object.keys(item).length === 0) {
+                console.log("No saved streaming data!")
+            }
+            else {
+                stream_data = item.cur_stream_data
+                browser.storage.local.set({'anime': stream_data.anime})
+                browser.storage.local.set({'curepisode': stream_data.cur_ep})
+                browser.storage.local.set({'totepisode': stream_data.tot_ep})
+                browser.storage.local.set({'season': stream_data.season})
+                update_session()
+            }
+        },
+        storage_err
+    )
+}) 
 
 document.getElementById("update_btn").addEventListener("click", ()=>{
     console.log("update")

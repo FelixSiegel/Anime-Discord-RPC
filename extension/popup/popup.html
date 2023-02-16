@@ -15,7 +15,7 @@
                 </div>
             </div>
             <div class="user-info">
-                <span class="username" id="username">Ice Warrior</span><span class="usertag" id="usertag">#0001</span>
+                <span class="username" id="username">Username</span><span class="usertag" id="usertag">#0001</span>
             </div>
             <div class="activity-box">
                 <div class="activity-header">playing a game</div>
@@ -42,19 +42,19 @@
         <div class="value-container">
             <div class="value-box">
                 <div class="value-header">anime</div>
-                <input id="anime_input" class="value-input" type="text" placeholder="Animename" maxlength="100">
+                <input id="anime_input" class="value-input" type="text" placeholder="none" maxlength="100">
             </div>
             <div class="value-box">
                 <div class="value-header">current episode</div>
-                <input id="cur_ep_inp" class="value-input" type="text" placeholder="Episodenumber" maxlength="100">
+                <input id="cur_ep_inp" class="value-input" type="text" placeholder="0" maxlength="100">
             </div>
             <div class="value-box">
                 <div class="value-header">episodes total</div>
-                <input id="total_ep_inp" class="value-input" type="text" placeholder="Episodecount" maxlength="100">
+                <input id="total_ep_inp" class="value-input" type="text" placeholder="0" maxlength="100">
             </div>
             <div class="value-box">
-                <div class="value-header">season episode</div>
-                <input id="cur_season_inp" class="value-input" type="text" placeholder="Seasonnumber" maxlength="100">
+                <div class="value-header">season</div>
+                <input id="cur_season_inp" class="value-input" type="text" placeholder="0" maxlength="100">
             </div>
             <div class="value-box">
                 <div class="value-header">stream host</div>
@@ -75,7 +75,7 @@
             </div>
             <div class="value-box">
                 <div class="value-header">anilist</div>
-                <input id="anilist_link" class="value-input" type="text" placeholder="Url" maxlength="100">
+                <input id="anilist_link" class="value-input" type="text" placeholder="url" maxlength="100">
             </div>
         </div>
         <div class="button_row">
@@ -83,7 +83,7 @@
                 <img id="stop_btn" src="images/stop.svg" title="Stop">
             </div>
             <div class="button_box">
-                <img onlick="sync()" src="images/update.svg" title="Sync with current Stream">
+                <img id="sync_btn" src="images/update.svg" title="Sync with current Stream">
             </div>
             <div class="button_box selected_green">
                 <img id="update_btn" src="images/play.svg" title="Update">
