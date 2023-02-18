@@ -51,7 +51,7 @@ def rpc_anime():
                 None if result["anilist"] == "" else [
                     {"label": "My AniList", "url": result["anilist"]}]
             )
-            print(args)
+
             if result["host"] == "aniworld":
                 rpc_aniworld.update(large_image=args[0], large_text=args[1], 
                                     details=args[2], state=args[3], start=args[4], buttons=args[5])

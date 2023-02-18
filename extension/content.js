@@ -60,7 +60,7 @@ window.onload = ()=>{
     }
 }
 
-window.onclose = () => {
+window.onbeforeunload = () => {
     // if tab is close -> stop contingently running RPC
     browser.runtime.sendMessage({"cmd": "clear"})
 }
