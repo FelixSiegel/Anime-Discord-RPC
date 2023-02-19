@@ -6,13 +6,14 @@
 }
 
 .content-box {
-    background-color: #18191c;
+    position: relative;
     display: flex;
     justify-content: center;
     flex-direction: column;
     min-width: 325px;
     max-width: 325px;
     border-radius: 8px;
+    background-color: #18191c;
     overflow: auto;
 }
 
@@ -280,4 +281,28 @@
 }
 .selected_red img {
     filter: invert(42%) sepia(11%) saturate(6254%) hue-rotate(326deg) brightness(84%) contrast(117%) !important;
+}
+
+.message-box {
+    position: absolute;
+    bottom: calc(50px + 2rem);
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    box-sizing: border-box;
+    pointer-events: none;
+}
+
+#message {
+    display: flex;
+    align-items: center;
+    padding: 0.25rem 1rem;
+    border-radius: 1rem;
+    height: 1rem;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    opacity: 0%;
+    transition: all 0.4s;
+    pointer-events: none;
 }

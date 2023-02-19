@@ -62,8 +62,22 @@ function update_from_storage(value, item) {
     update_season_inp(document.getElementById("cur_season_inp").value);
 }
 
+function show_message(msg, color) {
+    // fade in message
+    document.getElementById("message").innerText = msg;
+    document.getElementById("message").style.backgroundColor = color;
+    document.getElementById("message").style.opacity = "100%"
+    // hide after 2 seconds
+    setTimeout( () => {
+        document.getElementById("message").style.opacity = "0%"
+    }, 2000)
+}
+
 function storage_err(err) {
-    console.log(`Error: ${err}`)
+    // show error-message to popup.js
+    show_message("Storage Error", "red")
+    // log error to console
+    console.error(`[popup.js] Storage-Error: ${err}`)
 }
 
 function update_session() {
@@ -95,6 +109,8 @@ document.getElementById("stop_btn").addEventListener("click", ()=>{
     }).then(
         (response) => {
             console.log("Responsed data: ", response)
+            // TODO: check if response is correct or errormessage
+            show_message("Stopped RPC!", "#5865f2")
         }
     )
 })
@@ -106,7 +122,7 @@ document.getElementById("sync_btn").addEventListener("click", ()=>{
         (item) => {
             // if item is empty
             if (Object.keys(item).length === 0) {
-                console.log("No saved streaming data!")
+                show_message("No Data available", "red")
             }
             else {
                 stream_data = item.cur_stream_data
@@ -115,6 +131,7 @@ document.getElementById("sync_btn").addEventListener("click", ()=>{
                 browser.storage.local.set({'totepisode': stream_data.tot_ep})
                 browser.storage.local.set({'season': stream_data.season})
                 update_session()
+                show_message("Synced!", "#5865f2")
             }
         },
         storage_err
@@ -141,6 +158,8 @@ document.getElementById("update_btn").addEventListener("click", ()=>{
     }).then(
         (response) => {
             console.log("Responsed data: ", response)
+            // TODO: check for error on request
+            show_message("Updated!", "#5865f2")
         }
     )
 })
