@@ -75,7 +75,7 @@ function show_message(msg, color) {
 
 function storage_err(err) {
     // show error-message to popup.js
-    show_message("Storage Error", "red")
+    show_message("storage error!", "red")
     // log error to console
     console.error(`[popup.js] Storage-Error: ${err}`)
 }
@@ -106,13 +106,29 @@ document.getElementById("stop_btn").addEventListener("click", ()=>{
             'Content-Type': 'application/json'
         },
         body: JSON.stringify( datas )
-    }).then(
-        (response) => {
-            console.log("Responsed data: ", response)
-            // TODO: check if response is correct or errormessage
-            show_message("Stopped RPC!", "#5865f2")
-        }
-    )
+    })
+    .then( response => {
+        if (response.ok == true) { return response.json() }
+        else { return response.statusText }
+    })
+    .then( json => {
+            console.log("Responsed data: ", json)
+            if (typeof json == 'string' || json instanceof String) {
+                // Error from Request (like Internal Server Error)
+                show_message(json, "red")
+                return
+            } if (json["processed"] == "true") {
+                // if Process is true -> request was successfull
+                show_message("Stopped!", "#5865f2")
+            } else { 
+                // Process is false (not true)
+                show_message("invalid request!", "red") 
+            }
+    })
+    .catch( err => {
+        console.error("Error when fetching to Server: ", err)
+        show_message("requesting server failed!", "red")
+    })
 })
 
 
@@ -122,7 +138,7 @@ document.getElementById("sync_btn").addEventListener("click", ()=>{
         (item) => {
             // if item is empty
             if (Object.keys(item).length === 0) {
-                show_message("No Data available", "red")
+                show_message("no data available!", "red")
             }
             else {
                 stream_data = item.cur_stream_data
@@ -155,13 +171,29 @@ document.getElementById("update_btn").addEventListener("click", ()=>{
             'Content-Type': 'application/json'
         },
         body: JSON.stringify( datas )
-    }).then(
-        (response) => {
-            console.log("Responsed data: ", response)
-            // TODO: check for error on request
-            show_message("Updated!", "#5865f2")
-        }
-    )
+    })
+    .then( response => {
+        if (response.ok == true) { return response.json() }
+        else { return response.statusText }
+    })
+    .then( json => {
+            console.log("Responsed data: ", json)
+            if (typeof json == 'string' || json instanceof String) {
+                // Error from Request (like Internal Server Error)
+                show_message(json, "red")
+                return
+            } if (json["processed"] == "true") {
+                // if Process is true -> request was successfull
+                show_message("Updated!", "#5865f2")
+            } else { 
+                // Process is false (not true)
+                show_message("invalid request!", "red") 
+            }
+    })
+    .catch( err => {
+        console.error("Error when fetching to Server: ", err)
+        show_message("requesting server failed!", "red")
+    })
 })
 
 
