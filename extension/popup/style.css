@@ -5,16 +5,26 @@
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
-.content-box {
+body, html {
+    display: flex;
+    flex-direction: row;
+    max-width: 325px;
+    margin: 0; padding: 0; border: 0;
+    overflow: hidden;
+    background-color: #18191c;
+}
+
+.page {
     position: relative;
     display: flex;
-    justify-content: center;
+    flex-shrink: 0;
     flex-direction: column;
-    min-width: 325px;
-    max-width: 325px;
+    width: 325px;
     border-radius: 8px;
     background-color: #18191c;
-    overflow: auto;
+    overflow-y: auto;
+    overflow-x: hidden;
+    transition: all 0.2s;
 }
 
 .user-popup {
@@ -25,10 +35,26 @@
 }
 
 .profile-banner {
+    position: relative;
     height: 60px;
     width: 100%;
     background-color: #5865f2;
     border: 0; margin: 0; padding: 0;
+}
+
+.profile-banner:hover #settingsicon { opacity: 100%; }
+
+#settingsicon {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    box-sizing: border-box;
+    margin: 0.5rem;
+    width: 20px;
+    height: 20px;
+    opacity: 50%;
+    transition: all 0.3s;
+    cursor: pointer;
 }
 
 .avatar-holder {
@@ -204,6 +230,21 @@
     outline: none;
 }
 
+.value-checkbox {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    border: 1px #747f8d solid;
+    border-radius: 3px;
+    box-sizing: border-box;
+    margin: 6px 5px;
+    padding: 0; outline: none;
+    transition: all 0.2s;
+}
+
 .selected-item {
     display: flex;
     flex-direction: row;
@@ -306,4 +347,50 @@
     opacity: 0%;
     transition: all 0.4s;
     pointer-events: none;
+}
+
+.settings-header {
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    height: 45px;
+    border-bottom: 1px #a3a3a3 solid;
+    color: #c7c8ce;
+    background-color: #2b2d31;
+    box-sizing: border-box;
+    font-weight: 700;
+    font-size: 18px;
+    margin: 0; padding: 0;
+}
+
+#arrow_back {
+    padding: 0px 20px;
+    transition: all 0.4s;
+    cursor: pointer;
+}
+
+#arrow_back img {
+    filter: invert(92%) sepia(10%) saturate(106%) hue-rotate(194deg) brightness(86%) contrast(92%);
+}
+
+#arrow_back:hover {
+    background-color: #35383d;
+}
+
+.settings-body {
+    margin-top: 15px;
+    width: 100%;
+    box-sizing: border-box;
+    overflow-y: auto;
+}
+
+.question {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    overflow-x: hidden;
+    text-overflow: ellipsis;
+    align-items: center;
+    color: #f6f6f7;
+    margin: 5px 0px;
 }

@@ -1,13 +1,36 @@
 // wait for messages of content.js
 browser.runtime.onMessage.addListener((data, _sender, sendResponse) => {
-    console.info("Data: ", data.cmd)
+    console.info("Command of received data: ", data.cmd)
     if (data.cmd == "check") {
         sendResponse(browser.tabs.query({ active: true, windowId: browser.windows.WINDOW_ID_CURRENT })
             .then(tabs => browser.tabs.get(tabs[0].id))
             .then(tab => { console.log(String(tab.audible)); return tab.audible }))
     } else if (data.cmd == "update") {
-        console.info("Args: ", data.args)
-        updateRPC(data.args)
+        // before starting check if auto_streamsync is enabled -> if not use storage-value
+        browser.storage.local.get('auto_streamsync').then(
+            (item) => {
+                // if undefined set initial to enabled
+                if (item.auto_streamsync == undefined) {
+                    browser.storage.local.set({"auto_streamsync": "enabled"})
+                    item.auto_streamsync = "enabled"
+                } 
+                browser.storage.local.get('hostname')
+                .then((host) => {
+                        // if undefined set initial to aniworld
+                        if (host.hostname == undefined) {
+                            browser.storage.local.set({"hostname": "aniworld"})
+                            host.hostname = "aniworld"
+                        }
+                        // only if auto_streamsync is disabled edit datas
+                        if (item.auto_streamsync == 'disabled') { data.args.host = host.hostname; }
+                        return data.args
+                    })
+                .then((datas) => {
+                    console.info("Args: ", datas)
+                    updateRPC(datas)
+                })
+            }
+        )
     } else if (data.cmd == "clear") {
         clearRPC()
     }

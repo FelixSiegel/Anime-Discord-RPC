@@ -32,7 +32,7 @@ function update_episode_inp() {
     return;
 }
 
-// apply typing eventhandlers to inputs
+// apply typing eventhandlers to inputs of main-page
 document.getElementById("anime_input").addEventListener("keyup", (e)=>{
     browser.storage.local.set({"anime": e.target.value})
     update_anime_state(e.target.value);
@@ -80,6 +80,7 @@ function storage_err(err) {
     console.error(`[popup.js] Storage-Error: ${err}`)
 }
 
+// update page with values from storage
 function update_session() {
     browser.storage.local.get('hostname').then((item)=>{change_host(document.getElementById(item.hostname), storage_update=true)}, storage_err)
     browser.storage.local.get('anime').then((item)=>{update_from_storage("anime_input", item.anime)}, storage_err)
@@ -87,6 +88,10 @@ function update_session() {
     browser.storage.local.get('totepisode').then((item)=>{update_from_storage("total_ep_inp", item.totepisode)}, storage_err)
     browser.storage.local.get('season').then((item)=>{update_from_storage("cur_season_inp", item.season)}, storage_err)
     browser.storage.local.get('anilist').then((item)=>{update_from_storage("anilist_link", item.anilist)}, storage_err)
+    browser.storage.local.get('auto_rpc').then((item)=>{update_checkbox("auto_rpc", item.auto_rpc)}, storage_err)
+    browser.storage.local.get('auto_streamsync').then((item)=>{update_checkbox("auto_streamsync", item.auto_rpc)}, storage_err)
+    browser.storage.local.get('dc_name').then((item)=>{update_dc_name(item.dc_name)}, storage_err)
+    browser.storage.local.get('dc_tag').then((item)=>{update_dc_tag(item.dc_tag)}, storage_err)
 }
 
 // update rpc with values from input (maybe last session values)
@@ -217,8 +222,8 @@ document.getElementById("open_host").addEventListener("click", open_hosts_select
 function change_host(e, storage_update=false) {
     if (storage_update) {
         if (e == null) {
-            // if no host is provided in local-storage -> set host_ani as standart
-            browser.storage.local.set({"hostname": "host_ani"})
+            // if no host is provided in local-storage -> set aniworld as standart
+            browser.storage.local.set({"hostname": "aniworld"})
             document.getElementById("host_name").innerText = "Aniworld"
             return;
         } 
@@ -238,5 +243,91 @@ function change_host(e, storage_update=false) {
     open_hosts_selection(close=true);
 }
 
-document.getElementById("host_ani").addEventListener("click", (e)=>{change_host(e)})
-document.getElementById("host_crunchy").addEventListener("click", (e)=>{change_host(e)})
+document.getElementById("aniworld").addEventListener("click", (e)=>{change_host(e)})
+document.getElementById("crunchyroll").addEventListener("click", (e)=>{change_host(e)})
+
+
+// Functions for switch page between main and settingspage
+document.getElementById("settingsicon").addEventListener("click", ()=>{
+    document.getElementById("mainwindow").style.width = "0px";
+    document.getElementById("mainwindow").style.opacity = "0%";
+})
+
+document.getElementById("arrow_back").addEventListener("click", ()=>{
+    document.getElementById("mainwindow").style.width = "325px";
+    document.getElementById("mainwindow").style.opacity = "100%";
+})
+
+// update-Functions for inputs of settings-page
+function update_dc_name(value) {
+    if (value == undefined) {value="Username"}
+    browser.storage.local.set({"dc_name": value});
+    document.getElementById("dc_name_inp").value = value
+    document.getElementById("username").innerText = value;
+}
+function update_dc_tag(value) {
+    if (value == undefined) {value="0001"}
+    browser.storage.local.set({"dc_tag": value});
+    document.getElementById("dc_tag_inp").value = value
+    document.getElementById("usertag").innerText = "#"+value;
+}
+
+// apply typing eventhandlers to inputs of settings-page
+document.getElementById("dc_name_inp").addEventListener("keyup", (e)=>{update_dc_name(e.target.value)})
+document.getElementById("dc_tag_inp").addEventListener("keyup", (e)=>{update_dc_tag(e.target.value)})
+
+// Function for style checkbox as enabled
+function enable_checkbox(id) {
+    var box = document.getElementById(id);
+    box.style.backgroundColor = "#5865f2";
+    box.style.borderColor = "#5865f2";
+    box.innerHTML = `<img src="images/check.svg" width="20px" height="20px">`
+}
+
+// Function for style checkbox as disabled
+function disable_checkbox(id) {
+    var box = document.getElementById(id);
+    box.style.backgroundColor = "#0000";
+    box.style.borderColor = "#747f8d";
+    box.innerHTML = "";
+}
+
+// Function for update state of checkbox-element
+function update_checkbox(checkbox, item) {
+    storage_json = {};
+    // if no value is set -> set it initial to enabled
+    if (item == undefined) {
+        storage_json[checkbox] = "enabled";
+        browser.storage.local.set(storage_json);
+        item = "enabled";
+    }
+    // change checkbox style
+    if (item == 'enabled') { enable_checkbox(checkbox); }
+    else if (item == 'disabled') { disable_checkbox(checkbox); }
+    // update storage
+    storage_json[checkbox] = item;
+    browser.storage.local.set(storage_json);
+}
+
+// Click-Handler for switching state of checkboxes
+document.getElementById("auto_rpc").addEventListener("click", ()=>{
+    browser.storage.local.get('auto_rpc').then(
+        (item)=>{
+            console.log(`auto_rpc in localstorage was changed. Value before: ${item.auto_rpc}`)
+            if (item.auto_rpc=='enabled') {update_checkbox("auto_rpc", "disabled")}
+            else {update_checkbox("auto_rpc", "enabled")}
+        },
+        storage_err
+    )
+})
+
+document.getElementById("auto_streamsync").addEventListener("click", ()=>{
+    browser.storage.local.get('auto_streamsync').then(
+        (item)=>{
+            console.log(`auto_streamsync in localstorage was changed. Value before: ${item.auto_streamsync}`)
+            if (item.auto_streamsync=='enabled') {update_checkbox("auto_streamsync", "disabled")}
+            else {update_checkbox("auto_streamsync", "enabled")}
+        },
+        storage_err
+    )
+})

@@ -5,9 +5,13 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="content-box">
+    <div id="mainwindow" class="page">
         <div class="user-popup">
-            <div class="profile-banner"></div>
+            <div class="profile-banner">
+                <div id="settingsicon">
+                    <img width="20px" height="20px" src="images/settings.svg" title="Open Settings">
+                </div>
+            </div>
             <div class="avatar-holder">
                 <div class="avatar-box">
                     <div class="avatar-image"></div>
@@ -25,11 +29,11 @@
                         <img id="crunchyroll_logo" src="images/crunchyroll.png" title="Logo" style="display: none;">
                     </div>
                     <div class="activity-infobox">
-                        <div class="activity-info" id="host_name">Aniworld</div>
-                        <div class="activity-info" id="anime_value">Tokyo Ghoul</div>
+                        <div class="activity-info" id="host_name">AniWorld</div>
+                        <div class="activity-info" id="anime_value"></div>
                         <div class="activity-info" id="progress">
-                            <span id="progress_value" style="float: left;">Episode (1 of 12)</span>
-                            <span id="season_value">, Season 3</span>
+                            <span id="progress_value" style="float: left;"></span>
+                            <span id="season_value"></span>
                         </div>
                         <div class="activity-info">00:01 left</div>
                     </div>
@@ -68,8 +72,8 @@
                         </div>
                     </div>
                     <div id="stream_hosts" class="hosts-itemlist" >
-                        <div id="host_ani" class="host-item item-selected">AniWorld</div>
-                        <div id="host_crunchy" class="host-item">Crunchyroll</div>
+                        <div id="aniworld" class="host-item item-selected">AniWorld</div>
+                        <div id="crunchyroll" class="host-item">Crunchyroll</div>
                     </div>
                 </div>
             </div>
@@ -91,6 +95,33 @@
         </div>
         <div class="message-box">
             <div id="message"></div>
+        </div>
+    </div>
+    <div id="settingswindow" class="page">
+        <div class="settings-header">
+            <div class="settings-header" id="arrow_back"><img src="images/arrow-left.svg"></div>
+            <div class="settings-header"><p style="padding-left: 5px;">Settings</p></div>
+        </div>
+        <div class="settings-body">
+            <div class="value-box">
+                <div class="value-header">discord name</div>
+                <input id="dc_name_inp" class="value-input" type="text" placeholder="Username" maxlength="100">
+            </div>
+            <div class="value-box">
+                <div class="value-header">discord tag</div>
+                <input id="dc_tag_inp" class="value-input" type="text" placeholder="0001" maxlength="100">
+            </div>
+            <div class="value-box">
+                <div class="value-header">auto rpc</div>
+                <div class="question">
+                    <div id="auto_rpc" class="value-checkbox" type="checkbox"></div>
+                    <div>Auto start/stop RPC on watching</div>
+                </div>
+                <div class="question">
+                    <div id="auto_streamsync" class="value-checkbox" type="checkbox"></div>
+                    <div>Use current streamhost on auto RPC</div>
+                </div>
+            </div>
         </div>
     </div>
     <script src="popup.js"></script>
