@@ -89,7 +89,7 @@ function update_session() {
     browser.storage.local.get('season').then((item)=>{update_from_storage("cur_season_inp", item.season)}, storage_err)
     browser.storage.local.get('anilist').then((item)=>{update_from_storage("anilist_link", item.anilist)}, storage_err)
     browser.storage.local.get('auto_rpc').then((item)=>{update_checkbox("auto_rpc", item.auto_rpc)}, storage_err)
-    browser.storage.local.get('auto_streamsync').then((item)=>{update_checkbox("auto_streamsync", item.auto_rpc)}, storage_err)
+    browser.storage.local.get('auto_streamsync').then((item)=>{update_checkbox("auto_streamsync", item.auto_streamsync)}, storage_err)
     browser.storage.local.get('dc_name').then((item)=>{update_dc_name(item.dc_name)}, storage_err)
     browser.storage.local.get('dc_tag').then((item)=>{update_dc_tag(item.dc_tag)}, storage_err)
 }
@@ -296,11 +296,7 @@ function disable_checkbox(id) {
 function update_checkbox(checkbox, item) {
     storage_json = {};
     // if no value is set -> set it initial to enabled
-    if (item == undefined) {
-        storage_json[checkbox] = "enabled";
-        browser.storage.local.set(storage_json);
-        item = "enabled";
-    }
+    if (item == undefined) { item = "enabled"; }
     // change checkbox style
     if (item == 'enabled') { enable_checkbox(checkbox); }
     else if (item == 'disabled') { disable_checkbox(checkbox); }
