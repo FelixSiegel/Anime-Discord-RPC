@@ -5,7 +5,7 @@ function communicateToBackground(anime, cur_ep, max_ep, season) {
     .then((response) => {
         console.info("Playing_state: ", response)
         if (response==true && last_stand==false) {
-            // if tab was audible and before not -> start rpc
+            // if tab is now audible and before not -> start rpc
             browser.storage.local.get("anilist").then(
                 url => {
                     if (url.anilist == undefined) {url.anilist = ""}
@@ -28,6 +28,26 @@ function communicateToBackground(anime, cur_ep, max_ep, season) {
         }
         last_stand = response;
     })
+}
+
+/* Observing-Function to wait for an element to appear */
+function waitElement(selector, callback) {
+    // New MutationObserver to observe changes in DOM
+    var observer = new MutationObserver(mutations => {
+        // For each mutation occurs in DOM, check if element is present
+        mutations.forEach(mutation => {
+            var element = mutation.target.querySelector(selector);
+            if (element) {
+                observer.disconnect();
+                callback(element);
+            }
+        });
+    });
+    // start observing
+    observer.observe(document.documentElement, {
+        childList: true,
+        subtree: true
+    });
 }
 
 window.onload = ()=>{
@@ -75,6 +95,16 @@ window.onload = ()=>{
                 }, 5000);
             }
         }
+    }
+
+    if (document.location.host == "www.crunchyroll.com") {
+        console.clear()
+        waitElement('.erc-current-media-info', (infobox) => {
+            var anime = document.querySelector("a.show-title-link")
+                episode = document.querySelector(".erc-current-media-info h1.title")
+            console.info(`**CRUNCHYROLL**\nAnime: ${anime.innerText}\nCur Episode: ${cur_ep.innerText}\n`)
+            console.info(infobox)
+        })
     }
 }
 
