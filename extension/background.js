@@ -16,10 +16,10 @@ browser.runtime.onMessage.addListener((data, _sender, sendResponse) => {
                 } 
                 browser.storage.local.get('hostname')
                 .then((host) => {
-                        // if undefined set initial to aniworld
+                        // if undefined set initial to crunchyroll
                         if (host.hostname == undefined) {
-                            browser.storage.local.set({"hostname": "aniworld"})
-                            host.hostname = "aniworld"
+                            browser.storage.local.set({"hostname": "crunchyroll"})
+                            host.hostname = "crunchyroll"
                         }
                         // only if auto_streamsync is disabled edit datas
                         if (item.auto_streamsync == 'disabled') { data.args.host = host.hostname; }

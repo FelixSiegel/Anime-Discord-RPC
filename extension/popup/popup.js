@@ -222,9 +222,9 @@ document.getElementById("open_host").addEventListener("click", open_hosts_select
 function change_host(e, storage_update=false) {
     if (storage_update) {
         if (e == null) {
-            // if no host is provided in local-storage -> set aniworld as standart
-            browser.storage.local.set({"hostname": "aniworld"})
-            document.getElementById("host_name").innerText = "Aniworld"
+            // if no host is provided in local-storage -> set crunchyroll as standart
+            browser.storage.local.set({"hostname": "crunchyroll"})
+            document.getElementById("host_name").innerText = "Crunchyroll"
             return;
         } 
     } else { e = e.target }
