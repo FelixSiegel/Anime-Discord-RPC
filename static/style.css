@@ -73,6 +73,9 @@ body {
     border: 1px solid #444444;
 }
 
+.shutdown { color: #f65a5a; }
+.shutdown:hover {background-color: #693a3ac3;}
+
 .content-field {
     height: 100%;
     width: 100%;
