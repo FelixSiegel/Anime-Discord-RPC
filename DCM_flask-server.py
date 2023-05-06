@@ -22,6 +22,7 @@ APPLICATION_IDs = {
 
 app = Flask(__name__)
 CORS(app, resources={r"/rpc_anime": {"origins": "*"}})
+CORS(app, resources={r"/status": {"origins": "*"}})
 shutdown = False
 
 
@@ -83,6 +84,10 @@ def rpc_anime():
 
         return jsonify({'processed': 'true'})
     return render_template('rpc_anime.html')
+
+@app.route("/status", methods=['POST'])
+def status():
+    return jsonify({'status': 'ok'})
 
 # Shutdown Flask Server -> Solution worked fine found here
 # https://stackoverflow.com/questions/15562446/how-to-stop-flask-application-without-using-ctrl-c#answer-69812984

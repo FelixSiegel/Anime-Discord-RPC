@@ -92,6 +92,7 @@ function update_session() {
     browser.storage.local.get('auto_streamsync').then((item)=>{update_checkbox("auto_streamsync", item.auto_streamsync)}, storage_err)
     browser.storage.local.get('dc_name').then((item)=>{update_dc_name(item.dc_name)}, storage_err)
     browser.storage.local.get('dc_tag').then((item)=>{update_dc_tag(item.dc_tag)}, storage_err)
+    checkServerStatus()
 }
 
 // update rpc with values from input (maybe last session values)
@@ -281,7 +282,7 @@ function enable_checkbox(id) {
     var box = document.getElementById(id);
     box.style.backgroundColor = "#5865f2";
     box.style.borderColor = "#5865f2";
-    box.innerHTML = `<img src="images/check.svg" width="20px" height="20px">`
+    box.innerHTML = `<img src="images/icons/check.svg" width="20px" height="20px">`
 }
 
 // Function for style checkbox as disabled
@@ -326,4 +327,56 @@ document.getElementById("auto_streamsync").addEventListener("click", ()=>{
         },
         storage_err
     )
+})
+
+// Click-Handler for open/close settings-group
+var settings_groups = document.querySelectorAll(".group-title")
+settings_groups.forEach(group => {
+    group.addEventListener("click", (elmnt)=>{
+        console.log(elmnt.target)
+        elmnt.target.classList.toggle("group-active");
+        var content = elmnt.target.parentElement.children[1];
+        if (content.style.maxHeight){
+            content.style.maxHeight = null;
+            content.style.opacity = "0%";
+        } else {
+            content.style.maxHeight = content.scrollHeight + "px";
+            content.style.opacity = "100%";
+        } 
+    })
+})
+
+// Server Status
+function checkServerStatus() {
+    fetch("http://127.0.0.1:8000/status", {
+        method: "POST", 
+        headers: {
+            'Accept': 'application/json'
+        }
+    })
+    .then( response => {
+        if (response.ok == true) { return response.json() }
+        else { return response.statusText }
+    })
+    .then( json => {
+        console.log("Responsed data: ", json)
+        if (json.status == "ok") {
+            document.getElementById("status_img").src = "images/icons/correct.svg";
+            document.getElementById("server_status").innerText = "Server is running!";
+            document.getElementById("server_status").style.color = "#5bb66c";
+        }
+    })
+    .catch( err => {
+        console.error("Error when fetching to Server: ", err)
+        document.getElementById("status_img").src = "images/icons/incorrect.svg";
+        document.getElementById("server_status").innerText = "Server can't be accessed!";
+        document.getElementById("server_status").style.color = "red";
+    })
+}
+
+// Server Status button handling
+document.getElementById("check_status").addEventListener("click", checkServerStatus)
+document.getElementById("shutdown_btn").addEventListener("click", ()=>{
+    fetch("http://127.0.0.1:8000/exit").then(() => {checkServerStatus()})
+    .catch( () => {checkServerStatus()})
 })
