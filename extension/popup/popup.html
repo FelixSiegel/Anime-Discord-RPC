@@ -9,7 +9,7 @@
         <div class="user-popup">
             <div class="profile-banner">
                 <div id="settingsicon">
-                    <img width="20px" height="20px" src="images/settings.svg" title="Open Settings">
+                    <img width="20px" height="20px" src="images/icons/settings.svg" title="Open Settings">
                 </div>
             </div>
             <div class="avatar-holder">
@@ -25,8 +25,8 @@
                 <div class="activity-header">playing a game</div>
                 <div class="activity-body">
                     <div id="asset_holder" class="activity-asset">
-                        <img id="crunchyroll_logo" src="images/crunchyroll.png" title="Logo">
-                        <img id="aniworld_logo" src="images/aniworld.png" title="Logo" style="display: none;">
+                        <img id="crunchyroll_logo" src="images/streamhosts/crunchyroll.png" title="Logo">
+                        <img id="aniworld_logo" src="images/streamhosts/aniworld.png" title="Logo" style="display: none;">
                     </div>
                     <div class="activity-infobox">
                         <div class="activity-info" id="host_name">Crunhyroll</div>
@@ -84,13 +84,13 @@
         </div>
         <div class="button_row">
             <div class="button_box selected_red">
-                <img id="stop_btn" src="images/stop.svg" title="Stop">
+                <img id="stop_btn" src="images/icons/stop.svg" title="Stop">
             </div>
             <div class="button_box">
-                <img id="sync_btn" src="images/update.svg" title="Sync with current Stream">
+                <img id="sync_btn" src="images/icons/update.svg" title="Sync with current Stream">
             </div>
             <div class="button_box selected_green">
-                <img id="update_btn" src="images/play.svg" title="Update">
+                <img id="update_btn" src="images/icons/play.svg" title="Update">
             </div>
         </div>
         <div class="message-box">
@@ -99,27 +99,54 @@
     </div>
     <div id="settingswindow" class="page">
         <div class="settings-header">
-            <div class="settings-header" id="arrow_back"><img src="images/arrow-left.svg"></div>
+            <div class="settings-header" id="arrow_back"><img src="images/icons/arrow-left.svg"></div>
             <div class="settings-header"><p style="padding-left: 5px;">Settings</p></div>
         </div>
         <div class="settings-body">
-            <div class="value-box">
-                <div class="value-header">discord name</div>
-                <input id="dc_name_inp" class="value-input" type="text" placeholder="Username" maxlength="100">
-            </div>
-            <div class="value-box">
-                <div class="value-header">discord tag</div>
-                <input id="dc_tag_inp" class="value-input" type="text" placeholder="0001" maxlength="100">
-            </div>
-            <div class="value-box">
-                <div class="value-header">auto rpc</div>
-                <div class="question">
-                    <div id="auto_rpc" class="value-checkbox" type="checkbox"></div>
-                    <div>Auto start/stop RPC on watching</div>
+            <div class="settings-group">
+                <div class="group-title">Layout</div>
+                <div class="group-content">
+                    <div class="value-box">
+                        <div class="value-header">discord name</div>
+                        <input id="dc_name_inp" class="value-input" type="text" placeholder="Username" maxlength="100">
+                    </div>
+                    <div class="value-box">
+                        <div class="value-header">discord tag</div>
+                        <input id="dc_tag_inp" class="value-input" type="text" placeholder="0001" maxlength="100">
+                    </div>
                 </div>
-                <div class="question">
-                    <div id="auto_streamsync" class="value-checkbox" type="checkbox"></div>
-                    <div>Use current streamhost on auto RPC</div>
+            </div>
+            <div class="settings-group">
+                <div class="group-title">Auto-RPC</div>
+                <div class="group-content">
+                    <div class="value-box">
+                        <div class="question">
+                            <div id="auto_rpc" class="value-checkbox" type="checkbox"></div>
+                            <div>Enable Auto RPC</div>
+                        </div>
+                        <div class="question">
+                            <div id="auto_streamsync" class="value-checkbox" type="checkbox"></div>
+                            <div>Use streamhost from watching</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="settings-group">
+                <div class="group-title">Server</div>
+                <div class="group-content">
+                    <div class="value-box">
+                        <div class="value-header">status</div>
+                        <div class="status">
+                            <img id="status_img" width="16px" height="16px" src="images/icons/correct.svg" alt="status">
+                            <p id="server_status">Server is running!</p>
+                        </div>
+                        <div id="check_status"  class="value-action_button" style="background-color: #5865f2;">Check Status</div>
+                        <div id="shutdown_btn" class="value-action_button" style="background-color: #cf0000;">Shutdown Server</div>
+                    </div>
+                    <div class="value-box">
+                        <div class="value-header">help</div>
+                        <a class="value-action_button" style="background-color: #4f545c;" href="https://github.com/FelixSiegel/Discord-RPC">Lern more!</a>
+                    </div>
                 </div>
             </div>
         </div>

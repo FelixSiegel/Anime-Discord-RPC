@@ -22,6 +22,8 @@ APPLICATION_IDs = {
 
 app = Flask(__name__)
 CORS(app, resources={r"/rpc_anime": {"origins": "*"}})
+CORS(app, resources={r"/status": {"origins": "*"}})
+shutdown = False
 
 
 @app.route('/')
@@ -37,7 +39,7 @@ def rpc_default():
 @app.route('/rpc_anime', methods=['POST', 'GET'])
 def rpc_anime():
     if request.method == "POST":
-        print("\033[92m[INFO]:\033[00m Getting datas from rpc_anime.html", file=sys.stdout)
+        print("\033[92m[INFO]:\033[00m Getting datas from rpc_anime.html")
         result = request.get_json()
 
         if result["type"] == "update":
@@ -55,13 +57,13 @@ def rpc_anime():
             if result["host"] == "aniworld":
                 rpc_aniworld.update(large_image=args[0], large_text=args[1], 
                                     details=args[2], state=args[3], start=args[4], buttons=args[5])
-                print(f"\033[92m[INFO]:\033[00m Started Disord RPC with {result['host']}", file=sys.stdout)
+                print(f"\033[92m[INFO]:\033[00m Started Disord RPC with {result['host']}")
                 # clear possible open connection to crunchyroll-application
                 rpc_crunchy.clear()
             elif result["host"] == "crunchyroll":
                 rpc_crunchy.update(large_image=args[0], large_text=args[1],
                                    details=args[2], state=args[3], start=args[4], buttons=args[5])
-                print(f"\033[92m[INFO]:\033[00m Started Disord RPC with {result['host']}", file=sys.stdout)
+                print(f"\033[92m[INFO]:\033[00m Started Disord RPC with {result['host']}")
                 # clear possible open connection to aniworld-application
                 rpc_aniworld.clear()
             else:
@@ -71,7 +73,7 @@ def rpc_anime():
             try:
                 rpc_aniworld.clear()
                 rpc_crunchy.clear()
-                print("\033[92m[INFO]:\033[00m \033[33mStopped RPC\033[00m", file=sys.stdout)
+                print("\033[92m[INFO]:\033[00m \033[33mStopped RPC\033[00m")
             except Exception:
                 print("\033[91m[ERROR]:\033[00m No connection to Discord Gateway... Try reconnect automatically.")
                 rpc_aniworld.connect()
@@ -83,6 +85,25 @@ def rpc_anime():
         return jsonify({'processed': 'true'})
     return render_template('rpc_anime.html')
 
+@app.route("/status", methods=['POST'])
+def status():
+    return jsonify({'status': 'ok'})
+
+# Shutdown Flask Server -> Solution worked fine found here
+# https://stackoverflow.com/questions/15562446/how-to-stop-flask-application-without-using-ctrl-c#answer-69812984
+@app.route("/exit")
+def exit_app():
+    global shutdown
+    shutdown = True
+    return "Shutdown..."
+
+@app.teardown_request
+def teardown(_):
+    import os
+    if shutdown:
+        print("\033[91m[STOPPED]:\033[00m Shutdown Server")
+        os._exit(0)
+
 # Function to check if port is already in use
 def check_port(port: int) -> bool:
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
@@ -90,8 +111,8 @@ def check_port(port: int) -> bool:
     
 # Function logging errors from pypresence
 async def log_error(exception: Exception, future):
-    print(f"\033[91m[ERROR]:\033[00m Exception occured in PyPresence: ", file=sys.stdout)
-    print(f"\n>>> {exception}\n", file=sys.stdout)
+    print(f"\033[91m[ERROR]:\033[00m Exception occured in PyPresence: ")
+    print(f"\n>>> {exception}\n")
     # Set the result of the future to indicate that the exception has been handled.
     future.set_result(None)
 
@@ -110,8 +131,8 @@ if __name__ == '__main__':
 
     print("\033[92m[INFO]:\033[00m Start Flask server on port 8000")
     app.run(port=PORT)
-    print("\033[91m[STOPPED]:\033[00m Shutdown Server", file=sys.stdout)
+    print("\033[91m[STOPPED]:\033[00m Shutdown Server")
 
     rpc_aniworld.close()
     rpc_crunchy.close()
-    print("\033[91m[STOPPED]:\033[00m Closed connection to Discord Gateway", file=sys.stdout)
+    print("\033[91m[STOPPED]:\033[00m Closed connection to Discord Gateway")
