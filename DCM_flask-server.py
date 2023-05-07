@@ -3,7 +3,7 @@
 """
 Created on Tue Sep 20 18:40:56 2022
 
-@author: InfinityCoding
+@author: Revox179
 """
 import sys
 from requests import request
