@@ -362,6 +362,7 @@ function checkServerStatus() {
         console.log("Responsed data: ", json)
         if (json.status == "ok") {
             document.getElementById("status_img").src = "images/icons/correct.svg";
+            document.getElementById("status_img").classList.remove("rotating");
             document.getElementById("server_status").innerText = "Server is running!";
             document.getElementById("server_status").style.color = "#5bb66c";
         }
@@ -369,6 +370,7 @@ function checkServerStatus() {
     .catch( err => {
         console.error("Error when fetching to Server: ", err)
         document.getElementById("status_img").src = "images/icons/incorrect.svg";
+        document.getElementById("status_img").classList.remove("rotating");
         document.getElementById("server_status").innerText = "Server can't be accessed!";
         document.getElementById("server_status").style.color = "red";
     })
