@@ -46,7 +46,7 @@ Various actions can be performed in the settings of the pop-up menu.
 ![Settingsmenu](doc_images/doc_3.png
 )
 
-The user name and the tag can be entered in the **layout section**. However, this is only relevant for the design of the local display of the add-on and has no effect on the display on Discord.  
+The users displayname and the username (previously discriminator) can be entered in the **layout section**. However, this is only relevant for the design of the local display of the add-on and has no effect on the display on Discord.  
 
 The possibility of **Auto-RPC** means that a display is automatically started when you watch anime on one of the [supported sites](#currently-supported-websitesstream-hosts), or is automatically stopped when you stop watching. Logically, the values of the current stream are used and not those entered.  
 This can be activated or deactivated via the option 'Enable Auto RPC'.  
@@ -85,7 +85,7 @@ Value | Description | Required
 
 ### Standard installation
 
-To install the latest version you can find several files on GitHub [Releases](https://github.com/FelixSiegel/Discord-RPC/releases). If you use Windows you need the `DCM-flask_server.exe` and under Linux `DCM-flask_server`.  
+To install the latest version you can find several files on GitHub [Releases](https://github.com/Revox179/Anime-Discord-RPC/releases). If you use Windows you need the `DCM-flask_server.exe` and under Linux `DCM-flask_server`.  
 After downloading the file, under Linux you still need to mark the file as executable and otherwise just run it normally. To check whether the file has started, simply call `localhost:8000` in the browser. If the website is accessible, everything has worked. Alternatively, the file can also be started from the terminal to get an output that allows for better troubleshooting.  
 
 The add-on can be installed from [here](https://addons.mozilla.org/en-US/firefox/addon/anime-discord-rpc1/?utm_source=addons.mozilla.org&utm_medium=referral&utm_content=search) in Firefox.
