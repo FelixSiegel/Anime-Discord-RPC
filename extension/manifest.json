@@ -1,14 +1,14 @@
 {
     "manifest_version": 2,
     "name": "Anime Discord RPC",
-    "version": "1.1.0",
+    "version": "1.1.1",
 
     "description": "Free and OpenSource Firefox AddOn, allows you to get a rich presence display in Discord when watching anime. Please note that launching Rich Presence from the browser requires another background application to work.",
 
     "background": {
         "scripts": ["background.js"],
         "persistent": false
-    },      
+    },
 
     "content_scripts":[
         {
@@ -25,7 +25,7 @@
         "webRequest",
         "http://127.0.0.1:8000/*"
     ],
-    
+
     "browser_action": {
         "default_icon": "icons/logo-32.png",
         "default_title": "Test AddOn",

@@ -64,7 +64,7 @@ def rpc_anime():
                     print(f"\033[92m[INFO]:\033[00m Closed connection to Disord RPC with {result['host']}")
                 except Exception:
                     print("\033[91m[ERROR]:\033[00m No connection to Discord Gateway...")
-            
+
             if result["host"] in APPLICATION_IDs:
                 # create new event loop for rpc
                 loop = asyncio.new_event_loop()
@@ -99,7 +99,7 @@ def rpc_anime():
                     print("\033[91m[ERROR]:\033[00m No connection to Discord Gateway...")
             else:
                 print("\033[92m[INFO]:\033[00m No known running RPC-Connection to close")
-        else: 
+        else:
             print("\033[91m[ERROR]:\033[00m Request with no valid/known Type received")
             return jsonify({'processed': 'false'})
 
