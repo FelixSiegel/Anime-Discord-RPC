@@ -46,46 +46,60 @@ def rpc_anime():
         if result["type"] == "update":
             print("\033[92m[INFO]:\033[00m Updating-Request received")
             # args include all parameter for the rpc.update()-Function
-            args = [
-                result["host"],
-                f"{result['host']} logo",
-                result["details"],
-                result["state"],
-                int(time.time())
-            ]
+            args = {}
+            args['host'] = result.get("host")
+            args['details'] = result.get("details")
+            args['state'] = result.get("state")
+            args['start'] = int(time.time())
+
+            # if provided, include image and text for large_image else use host as large_image
+            if result.get('large_image'):
+                args['large_image'] = result['large_image']
+                args['large_text'] = 'Image by AniList'
+            else:
+                args['large_image'] = result.get('host')
+                args['large_text'] = f"{result['host']} logo"
+
+
             # include AniList-Button if link is provided
-            args.append(None if result["anilist"] == "" else [{"label": "My AniList", "url": result["anilist"]}])
+            args['buttons'] = [{"label": "My AniList", "url": result["anilist"]}] if result.get('anilist') else None
 
             if rpc is not None:
                 try:
                     rpc.clear()
                     rpc.close()
                     rpc = None
-                    print(f"\033[92m[INFO]:\033[00m Closed connection to Disord RPC with {result['host']}")
+                    print(f"\033[92m[INFO]:\033[00m Closed connection to Disord RPC with {args['host']}")
                 except Exception:
                     print("\033[91m[ERROR]:\033[00m No connection to Discord Gateway...")
 
-            if result["host"] in APPLICATION_IDs:
+            if not args["host"] in APPLICATION_IDs:
+                print(f"\033[91m[ERROR]:\033[00m No valid Host: {result['host']}")
+                return jsonify({'processed': 'false'})
+
+            elif not args["details"] and not args["state"]:
+                print(f"\033[91m[ERROR]:\033[00m No valid Details or State provided")
+                return jsonify({'processed': 'false'})
+
+            else:
                 # create new event loop for rpc
                 loop = asyncio.new_event_loop()
                 asyncio.set_event_loop(loop)
 
                 # start new rpc connection and update it with values from args
-                rpc = Presence(APPLICATION_IDs[result["host"]], loop=loop)
+                rpc = Presence(APPLICATION_IDs[args["host"]], loop=loop)
                 rpc.connect()
-                print(f"\033[92m[INFO]:\033[00m Connected to Disord RPC with {result['host']}")
+                print(f"\033[92m[INFO]:\033[00m Connected to Disord RPC with {args['host']}")
                 rpc.update(
-                    large_image=args[0],
-                    large_text=args[1],
-                    details=args[2],
-                    state=args[3],
-                    start=args[4],
-                    buttons=args[5]
+                    large_image=args['large_image'],
+                    large_text=args['large_text'],
+                    details=args['details'],
+                    state=args['state'],
+                    start=args['start'],
+                    buttons=args['buttons']
                 )
-                print(f"\033[92m[INFO]:\033[00m Started Disord RPC with {result['host']}")
-            else:
-                print(f"\033[91m[ERROR]:\033[00m No valid Host: {result['host']}")
-                return jsonify({'processed': 'false'})
+                print(f"\033[92m[INFO]:\033[00m Started Disord RPC with {args['host']}")
+
 
         elif result["type"] == "clear":
             print("\033[92m[INFO]:\033[00m Clear-Request received")

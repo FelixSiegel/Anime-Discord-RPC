@@ -13,7 +13,7 @@ browser.runtime.onMessage.addListener((data, _sender, sendResponse) => {
                 if (item.auto_streamsync == undefined) {
                     browser.storage.local.set({"auto_streamsync": "enabled"})
                     item.auto_streamsync = "enabled"
-                } 
+                }
                 browser.storage.local.get('hostname')
                 .then((host) => {
                         // if undefined set initial to crunchyroll
@@ -21,8 +21,10 @@ browser.runtime.onMessage.addListener((data, _sender, sendResponse) => {
                             browser.storage.local.set({"hostname": "crunchyroll"})
                             host.hostname = "crunchyroll"
                         }
-                        // only if auto_streamsync is disabled edit datas
+                        // if auto_streamsync is disabled edit datas and use selected host from user
                         if (item.auto_streamsync == 'disabled') { data.args.host = host.hostname; }
+                        // if rpc logo ist activated -> search for cover image and add link if found
+
                         return data.args
                     })
                 .then((datas) => {

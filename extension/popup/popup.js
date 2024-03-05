@@ -1,8 +1,72 @@
 console.log("Hello from the popup.js");
 
-function update_anime_state(state) {
-    if (state=="") {document.getElementById("anime_value").innerText = ""}
-    else {document.getElementById("anime_value").innerText = "Watching " + state}
+function update_anime_state(state, timeout=0) {
+    if (state=="") {
+        document.getElementById("anime_value").innerText = "";
+        document.getElementById("cover_image").src = "";
+        document.getElementById("cover_image").style.display = "none";
+        browser.storage.local.get('hostname').then((item)=>{
+            if (item.hostname == "aniworld") {
+                document.getElementById("aniworld_logo").style.display = "block";
+            } else {
+                document.getElementById("crunchyroll_logo").style.display = "block";
+            }
+
+        }, storage_err)
+    } else {
+        document.getElementById("anime_value").innerText = "Watching " + state;
+
+        browser.storage.local.get('rpc_logo').then((item)=>{
+            if (item.rpc_logo == "enabled") {
+                // try fetch cover image from anilist
+                // to prevent too many requests -> set timeout
+                let cover_img = document.getElementById("cover_image")
+                let timeout_id = cover_img.getAttribute("data-timeoutid")
+                if ( timeout_id ) {clearTimeout(timeout_id)}
+                timeout_id = setTimeout(() => {
+                    fetch(`https://graphql.anilist.co`, {
+                        method: "POST",
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            query: `query ($title: String) {
+                                Media(search: $title, type: ANIME) {
+                                    coverImage {
+                                        large
+                                    }
+                                }
+                            }`,
+                            variables: {
+                                title: state
+                            }
+                        })
+                    })
+                    .then( response => {
+                        if (response.ok == true && response.status == 200) { return response.json() }
+                        else { throw new Error(`Request status is not ok (Status: ${response.status} | OK: ${response.ok})`) }
+                    })
+                    .then(data => {
+                        if (data?.data?.Media?.coverImage?.large) {
+                            cover_img.src = data.data.Media.coverImage.large;
+                            cover_img.onload = () => {
+                                cover_img.style.display = "block";
+                                document.getElementById("aniworld_logo").style.display = "none";
+                                document.getElementById("crunchyroll_logo").style.display = "none";
+                            }
+                        }
+                    })
+                    .catch(err => {
+                        console.error("Error when fetching cover image: ", err.message)
+                        show_message("can't fetch cover image!", "red")
+                        update_anime_state("")
+                    })
+                }, timeout);
+                cover_img.setAttribute("data-timeoutid", timeout_id)
+            }
+        }, storage_err)
+    }
     return
 }
 function update_season_inp(state) {
@@ -35,7 +99,7 @@ function update_episode_inp() {
 // apply typing eventhandlers to inputs of main-page
 document.getElementById("anime_input").addEventListener("keyup", (e)=>{
     browser.storage.local.set({"anime": e.target.value})
-    update_anime_state(e.target.value);
+    update_anime_state(e.target.value, 800);
 })
 document.getElementById("cur_season_inp").addEventListener("keyup", (e)=>{
     browser.storage.local.set({"season": e.target.value})
@@ -92,6 +156,8 @@ function update_session() {
     browser.storage.local.get('auto_streamsync').then((item)=>{update_checkbox("auto_streamsync", item.auto_streamsync)}, storage_err)
     browser.storage.local.get('dc_dname').then((item)=>{update_dc_dname(item.dc_dname)}, storage_err)
     browser.storage.local.get('dc_uname').then((item)=>{update_dc_uname(item.dc_uname)}, storage_err)
+    browser.storage.local.get('rpc_logo').then((item)=>{update_checkbox("rpc_logo", item.rpc_logo)}, storage_err)
+    browser.storage.local.get('rpc_smallimage').then((item)=>{update_checkbox("rpc_smallimage", item.rpc_details)}, storage_err)
     checkServerStatus()
 }
 
@@ -99,14 +165,13 @@ function update_session() {
 window.onload = update_session
 
 // Button event handling
-
 document.getElementById("stop_btn").addEventListener("click", ()=>{
-    datas = { 
+    datas = {
         "type": "clear"
     }
 
     fetch("http://127.0.0.1:8000/rpc_anime", {
-        method: "POST", 
+        method: "POST",
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
@@ -126,9 +191,9 @@ document.getElementById("stop_btn").addEventListener("click", ()=>{
             } if (json["processed"] == "true") {
                 // if Process is true -> request was successfull
                 show_message("Stopped!", "#5865f2")
-            } else { 
+            } else {
                 // Process is false (not true)
-                show_message("invalid request!", "red") 
+                show_message("invalid request!", "red")
             }
     })
     .catch( err => {
@@ -137,8 +202,6 @@ document.getElementById("stop_btn").addEventListener("click", ()=>{
     })
 })
 
-
-// Function for sync data from current stream with data from local-storage
 document.getElementById("sync_btn").addEventListener("click", ()=>{
     browser.storage.local.get('cur_stream_data').then(
         (item) => {
@@ -158,20 +221,24 @@ document.getElementById("sync_btn").addEventListener("click", ()=>{
         },
         storage_err
     )
-}) 
+})
 
-document.getElementById("update_btn").addEventListener("click", ()=>{
+document.getElementById("update_btn").addEventListener("click", () => {
     console.log("update")
-    datas = { 
+    datas = {
         "type": "update",
-        "host": document.getElementById("host_name").innerText.toLowerCase(), 
-        "details": document.getElementById("anime_value").innerText, 
+        "host": document.getElementById("host_name").innerText.toLowerCase(),
+        "details": document.getElementById("anime_value").innerText,
         "state": document.getElementById("progress").innerText.replace("\n", ""),
         "anilist": document.getElementById("anilist_link").value
     }
 
+    if (document.getElementById("cover_image").src.startsWith('https://')) {
+        datas["large_image"] = document.getElementById("cover_image").src
+    }
+
     fetch("http://127.0.0.1:8000/rpc_anime", {
-        method: "POST", 
+        method: "POST",
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
@@ -191,9 +258,9 @@ document.getElementById("update_btn").addEventListener("click", ()=>{
             } if (json["processed"] == "true") {
                 // if Process is true -> request was successfull
                 show_message("Updated!", "#5865f2")
-            } else { 
+            } else {
                 // Process is false (not true)
-                show_message("invalid request!", "red") 
+                show_message("invalid request!", "red")
             }
     })
     .catch( err => {
@@ -223,24 +290,27 @@ document.getElementById("open_host").addEventListener("click", open_hosts_select
 function change_host(e, storage_update=false) {
     if (storage_update) {
         if (e == null) {
-            // if no host is provided in local-storage -> set crunchyroll as standart
+            // if no host is provided in local-storage -> set crunchyroll as default
             browser.storage.local.set({"hostname": "crunchyroll"})
             document.getElementById("host_name").innerText = "Crunchyroll"
             return;
-        } 
+        }
     } else { e = e.target }
     // update
-    document.getElementById("cur_host").innerText = e.innerText.replace(/\s/g, "");
-    document.getElementById("host_name").innerText = e.innerText.replace(/\s/g, "");
+    document.getElementById("cur_host").innerText = e.innerText;
+    document.getElementById("host_name").innerText = e.innerText;
     // save value to localStorage
     browser.storage.local.set({"hostname": e.id})
     // change cur selected style and close menu
     document.getElementsByClassName("item-selected")[0].classList.remove("item-selected")
     e.classList.add("item-selected");
-    Array(...document.getElementById("asset_holder").children).forEach(el => {
-        if (el.id == `${e.innerText.replace(/\s/g, "").toLocaleLowerCase()}_logo`) {el.style.display = "block"}
-        else {el.style.display = "none"}
-    });
+    // if no cover image set logo to selected host
+    if (!document.getElementById("cover_image").src.startsWith("https://")) {
+        document.querySelectorAll("#asset_holder img").forEach(el => {
+            if (el.id == `${e.innerText.toLowerCase()}_logo`) {el.style.display = "block"}
+            else {el.style.display = "none"}
+        });
+    }
     open_hosts_selection(close=true);
 }
 
@@ -329,6 +399,40 @@ document.getElementById("auto_streamsync").addEventListener("click", ()=>{
     )
 })
 
+document.getElementById("rpc_logo").addEventListener("click", ()=>{
+    browser.storage.local.get('rpc_logo').then(
+        (item)=>{
+            console.log(`rpc_logo in localstorage was changed. Value before: ${item.rpc_logo}`)
+            if (item.rpc_logo=='enabled') {
+                update_checkbox("rpc_logo", "disabled");
+                document.getElementById("cover_image").src = "";
+                document.querySelectorAll("#asset_holder img").forEach(el => {
+                    if (el.id == `${document.getElementById("cur_host").innerText.toLowerCase()}_logo`) {
+                        el.style.display = "block";
+                    }
+                    else { el.style.display = "none"; }
+                });
+            }
+            else {
+                update_checkbox("rpc_logo", "enabled");
+                update_anime_state(document.getElementById("anime_input").value);
+            }
+        },
+        storage_err
+    )
+});
+
+document.getElementById("rpc_smallimage").addEventListener("click", ()=>{
+    browser.storage.local.get('rpc_smallimage').then(
+        (item)=>{
+            console.log(`rpc_smallimage in localstorage was changed. Value before: ${item.rpc_smallimage}`)
+            if (item.rpc_smallimage=='enabled') {update_checkbox("rpc_smallimage", "disabled")}
+            else {update_checkbox("rpc_smallimage", "enabled")}
+        },
+        storage_err
+    )
+});
+
 // Click-Handler for open/close settings-group
 var settings_groups = document.querySelectorAll(".group-title")
 settings_groups.forEach(group => {
@@ -342,14 +446,14 @@ settings_groups.forEach(group => {
         } else {
             content.style.maxHeight = content.scrollHeight + "px";
             content.style.opacity = "100%";
-        } 
+        }
     })
 })
 
 // Server Status
 function checkServerStatus() {
     fetch("http://127.0.0.1:8000/status", {
-        method: "POST", 
+        method: "POST",
         headers: {
             'Accept': 'application/json'
         }

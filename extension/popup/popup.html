@@ -28,6 +28,7 @@
                     <div id="asset_holder" class="activity-asset">
                         <img id="crunchyroll_logo" src="images/streamhosts/crunchyroll.png" title="Logo">
                         <img id="aniworld_logo" src="images/streamhosts/aniworld.png" title="Logo" style="display: none;">
+                        <img id="cover_image" src="" title="Logo" style="display: none;" data-timeoutid="">
                     </div>
                     <div class="activity-infobox">
                         <div class="activity-info" id="host_name">Crunhyroll</div>
@@ -128,6 +129,30 @@
                         <div class="question">
                             <div id="auto_streamsync" class="value-checkbox" type="checkbox"></div>
                             <div>Use streamhost from watching</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="settings-group">
+                <div class="group-title">RPC Details</div>
+                <div class="group-content">
+                    <div class="value-box">
+                        <div class="question">
+                            <div id="rpc_logo" class="value-checkbox" type="checkbox"></div>
+                            <div>Use Anime-Cover</div>
+                        </div>
+                        <div class="value-description" data-for="rpc_logo">
+                            If enabled, the cover of the anime will be used as the RPC image.
+                            If disabled or cover isn't available, the logo of the streamhost will be used.
+                            Covers are powered by <a href="https://anilist.co">AniList</a>.
+                        </div>
+                        <div class="question">
+                            <div id="rpc_smallimage" class="value-checkbox" type="checkbox"></div>
+                            <div>Streamhost as small image</div>
+                        </div>
+                        <div class="value-description" data-for="rpc_smallimage">
+                            If enabled, the logo of the streamhost will be added as a small image to the RPC.
+                            (Shown in the bottom right corner)
                         </div>
                     </div>
                 </div>

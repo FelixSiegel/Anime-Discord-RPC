@@ -249,6 +249,19 @@ body, html {
     transition: all 0.2s;
 }
 
+.value-description {
+    display: block;
+    padding: 0px 5px;
+    font-size: 12px;
+    line-height: 16px;
+    color: #b9b8b6;
+}
+
+.value-description a {
+    color: #7289da;
+    text-decoration: none;
+}
+
 .value-action_button {
     display: flex;
     align-items: center;
