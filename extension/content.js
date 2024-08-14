@@ -1,166 +1,200 @@
-var last_stand = false
-function communicateToBackground(host, anime, cur_ep=null, max_ep=null, season=null, episode=null) {
-    // first send check-request to check if tab is audible
-    browser.runtime.sendMessage({"cmd": "check"})
-    .then((response) => {
-        console.info("Playing_state: ", response)
-        if (response==true && last_stand==false) {
-            // if tab is now audible and before not -> start rpc
-            browser.storage.local.get("anilist").then(
-                url => {
-                    if (url.anilist == undefined) {url.anilist = ""}
-                    // start RPC with current data when audio start
-                    if (host == "aniworld") {
-                        browser.runtime.sendMessage({
-                            "cmd": "update", 
-                            "args": { 
-                                "type": "update",
-                                "host": "aniworld", 
-                                "details": anime, 
-                                "state": `Episode (${cur_ep} of ${max_ep}), Season ${season}`,
-                                "anilist": url.anilist
-                            }
-                        })
-                    }
-                    if (host == "crunchyroll") {
-                        browser.runtime.sendMessage({
-                            "cmd": "update", 
-                            "args": { 
-                                "type": "update",
-                                "host": "crunchyroll", 
-                                "details": anime, 
-                                "state": `Episode: ${episode}`,
-                                "anilist": url.anilist
-                            }
-                        })
-                    }
+let wasAudibleBefore = false
+
+/**
+ * Handles communication with the background script to update or clear the status of media playback.
+ *
+ * This function checks the current browser tab audible state and, based on the state before, either updates
+ * the media playback status via a background script or clears it if the audio has stopped.
+ * This is necessary because the content script does not have permission to access the browser's `tabs` API,
+ * which is required to check if a tab is audible.
+ *
+ * @param {string} host - The media host, such as "aniworld" or "crunchyroll".
+ * @param {string} anime - The title of the anime currently being watched.
+ * @param {string} episode_details - The details of the current episode or progress of the anime.
+ *
+ * @returns {Promise<void>} - A promise that resolves when the function has completed its operations.
+ *
+ * @example
+ * communicateToBackground("aniworld", "My Hero Academia", "Episode 1 of 13, Season 1");
+ *
+ * @example
+ * communicateToBackground("crunchyroll", "Attack on Titan", "Episode 1");
+ */
+async function communicateToBackground(host, anime, episode_details) {
+    try {
+        const response = await browser.runtime.sendMessage({ cmd: "check" });
+        console.info("Playing_state: ", response);
+
+        if (response && !wasAudibleBefore) {
+            const { anilist: anilist_url = "" } = await browser.storage.local.get("anilist");
+
+            const messageArgs = {
+                cmd: "update",
+                args: {
+                    type: "update",
+                    host: host,
+                    details: anime,
+                    state: episode_details,
+                    anilist: anilist_url
                 }
-            )
-        } else if (response==false && last_stand==true) {
-            // clear RPC when audio stopped
-            browser.runtime.sendMessage({"cmd": "clear"})
+            };
+
+            await browser.runtime.sendMessage(messageArgs);
+        } else if (!response && wasAudibleBefore) {
+            await browser.runtime.sendMessage({ cmd: "clear" });
         }
-        last_stand = response;
-    })
+
+        wasAudibleBefore = response;
+    } catch (error) {
+        console.error("Failed to communicate with the background script:", error);
+    }
 }
 
-/* Observing-Function to wait for an element to appear */
-function waitElement(selector, callback) {
-    // New MutationObserver to observe changes in DOM
-    var observer = new MutationObserver(mutations => {
-        // For each mutation occurs in DOM, check if element is present
-        mutations.forEach(mutation => {
-            var element = mutation.target.querySelector(selector);
-            if (element) {
-                observer.disconnect();
-                callback(element);
+/**
+ * Checks continusley if the current anime is playing and sends the details to the background script using
+ * the `communicateToBackground` function. If auto rpc is disabled nothing will happen.
+ *
+ * @param {string} host - The host of the anime.
+ * @param {string} anime - The name of the anime.
+ * @param {string} episode_details - The details of the episode.
+ *
+ * @returns {void}
+ *
+ * @example
+ * checkAnimePlaying("aniworld", "My Hero Academia", "Episode 1 of 13, Season 1");
+ */
+async function checkAnimePlaying(host, anime, episode_details) {
+    const checkAutoRpcStatus = async () => {
+        try {
+            let { auto_rpc } = await browser.storage.local.get('auto_rpc');
+            if (auto_rpc === undefined) {
+                await browser.storage.local.set({ "auto_rpc": "enabled" });
+                auto_rpc = "enabled";
             }
-        });
+            return auto_rpc;
+        } catch (err) {
+            console.error("Failed to check auto_rpc status:", err);
+            return null;
+        }
+    }
+
+    setInterval(async () => {
+        const autoRpcStatus = await checkAutoRpcStatus();
+        if (autoRpcStatus === 'enabled') {
+            communicateToBackground(host, anime, episode_details);
+        }
+    }, 5000);
+}
+
+/**
+ * Waits for an element matching the given selector to be added to the DOM and then calls
+ * the callback function with the element.
+ *
+ * @param {string} selector - The CSS selector to match the element.
+ * @param {function} callback - The callback function to be called with the matched element.
+ *
+ * @returns {void}
+ *
+ * @example
+ * waitElement(".my-element", (element) => {
+ *    console.log("Element added to the DOM:", element);
+ * });
+ */
+function waitElement(selector, callback) {
+    const observer = new MutationObserver((mutations, obs) => {
+        for (const mutation of mutations) {
+            if (mutation.addedNodes.length) {
+                const element = mutation.target.querySelector(selector);
+                if (element) {
+                    obs.disconnect();
+                    callback(element);
+                    return;
+                }
+            }
+        }
     });
-    // start observing
+
     observer.observe(document.documentElement, {
         childList: true,
         subtree: true
     });
 }
 
-window.onload = ()=>{
-    if (document.location.host == "aniworld.to") {
-        console.clear()
-        streamBox = document.getElementsByClassName("inSiteWebStream")
-        if (streamBox.length > 0) {
-            infos = document.getElementsByClassName("hosterSiteTitle")[0]
-            if (infos.getAttribute("data-season") != "0") { // if season is selected, not film
-                // get current stream data
-                var anime = document.getElementsByClassName("series-title")[0].children[0].innerText;
-                    season = infos.getAttribute("data-season");
-                    cur_ep = document.getElementsByClassName("active")[1].innerText;
-                    max_ep = document.getElementsByClassName("active")[1].parentElement.parentElement.childElementCount -1;
+window.onload = () => {
+    switch (document.location.host) {
+        case 'aniworld.to': {
+            if (!document.querySelector(".inSiteWebStream")) return;
+
+            const infos = document.querySelector(".hosterSiteTitle");
+            const anime = document.querySelector(".series-title").children[0].innerText;
+            let details;
+
+            // Film selected:
+            if (infos.getAttribute("data-season") == 0) {
+                // TODO
+            }
+
+            // Season selected:
+            else {
+                const season = infos.getAttribute("data-season");
+                const cur_ep = document.querySelector(".active").innerText;
+                const tot_ep = document.querySelector(".active").parentElement.parentElement.childElementCount - 1;
 
                 console.log("Anime: ", anime);
                 console.log("Season: ", season);
-                console.log("Cur Episode: ", cur_ep);
-                console.log("Max Episode: ", max_ep);
+                console.log("Current Episode: ", cur_ep);
+                console.log("Total Episodes: ", tot_ep);
 
-                // save current stream data to local-storage for sync-function from popup.js
+                // save data to local-storage for sync-functionality (popup)
                 browser.storage.local.set({
-                    "cur_stream_data": {
+                    "latest_stream": {
                         "anime": anime,
-                        "cur_ep": cur_ep,
-                        "tot_ep": max_ep,
+                        "current_episode": cur_ep,
+                        "total_episodes": tot_ep,
                         "season": season
                     }
                 })
 
-                // check every 5 seconds if audio is playing
-                checkPlaying = setInterval(() => {
-                    // first check if auto_rpc is enabled
-                    browser.storage.local.get('auto_rpc').then(
-                        (item) => {
-                            // if undefined -> set initial to enabled
-                            if (item.auto_rpc == undefined) {
-                                browser.storage.local.set({"auto_rpc": "enabled"})
-                                item.auto_rpc = 'enabled'
-                            }
-                            // if enabled start requesting with background.js
-                            if (item.auto_rpc == 'enabled') {communicateToBackground("aniworld", anime, cur_ep, max_ep, season)}
-                        }
-                    )
-                }, 5000);
+                details = `Episode ${cur_ep} of ${tot_ep} (Season ${season})`;
             }
+
+            checkAnimePlaying("aniworld", anime, details);
+            break;
         }
-    }
+        case 'www.crunchyroll.com': {
+            waitElement('.erc-current-media-info', (infobox) => {
+                const anime = document.querySelector("a.show-title-link")?.innerText || "Unkown Anime";
+                const details = infobox.querySelector("h1.title")?.innerText || "Unkown episode";
 
-    if (document.location.host == "www.crunchyroll.com") {
-        console.clear()
-        waitElement('.erc-current-media-info', (infobox) => {
-            var anime = document.querySelector("a.show-title-link").innerText
-                episode = document.querySelector(".erc-current-media-info h1.title").innerText
+                console.log("Anime: ", anime);
+                console.log("Episode: ", details);
 
-            console.log("Anime: ", anime)
-            console.log("Episode: ", episode)
-
-            // save current stream data to local-storage for sync-function from popup.js
-            browser.storage.local.set({
-                "cur_stream_data": {
-                    "anime": anime,
-                    "cur_ep": "",
-                    "tot_ep": "",
-                    "season": ""
-                }
-            })
-
-            // check every 5 seconds if audio is playing
-            checkPlaying = setInterval(() => {
-                // first check if auto_rpc is enabled
-                browser.storage.local.get('auto_rpc').then(
-                    (item) => {
-                        // if undefined -> set initial to enabled
-                        if (item.auto_rpc == undefined) {
-                            browser.storage.local.set({"auto_rpc": "enabled"})
-                            item.auto_rpc = 'enabled'
-                        }
-                        // if enabled start requesting with background.js
-                        if (item.auto_rpc == 'enabled') {communicateToBackground("crunchyroll", anime, null, null, null, episode)}
+                // save data to local-storage for sync-functionality (popup)
+                browser.storage.local.set({
+                    "latest_stream": {
+                        "anime": anime,
+                        "current_episode": "",
+                        "total_episodes": "",
+                        "season": ""
                     }
-                )
-            }, 5000);
-        })
+                })
+
+                checkAnimePlaying("crunchyroll", anime, details);
+            });
+            break;
+        }
     }
 }
 
-// if tab/window was closed stop RPC (only if auto_rpc is enabled)
 window.onbeforeunload = () => {
-    // first check if auto_rpc is enabled
     browser.storage.local.get('auto_rpc').then(
         (item) => {
-            // if undefined -> set initial to enabled
-            if (item.auto_rpc == undefined) {
-                browser.storage.local.set({"auto_rpc": "enabled"})
-                item.auto_rpc = 'enabled'
+            if (item.auto_rpc === undefined) {
+                browser.storage.local.set({ "auto_rpc": "enabled" });
+                item.auto_rpc = 'enabled';
             }
-            // if enabled start -> stop contingently running RPC
-            if (item.auto_rpc == 'enabled') {browser.runtime.sendMessage({"cmd": "clear"})}
+
+            if (item.auto_rpc === 'enabled') { browser.runtime.sendMessage({ "cmd": "clear" }); }
         }
     )
 }

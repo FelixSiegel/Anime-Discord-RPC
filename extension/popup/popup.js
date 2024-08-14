@@ -213,7 +213,7 @@ function change_host(element, storage_update = false) {
             else { el.style.display = "none" }
         });
     }
-    toggle_host_selection(force_close = true);
+    toggle_host_selection(true);
 }
 
 /**
@@ -370,10 +370,10 @@ function update_from_storage(element, value) {
  */
 function update_session() {
     browser.storage.local.get().then((item) => {
-        change_host(document.getElementById(item.hostname), storage_update = true);
+        change_host(document.getElementById(item.hostname), true);
         update_from_storage("anime_input", item.anime);
         update_from_storage("cur_ep_inp", item.current_episode);
-        update_from_storage("total_ep_inp", item.total_episode);
+        update_from_storage("total_ep_inp", item.total_episodes);
         update_from_storage("cur_season_inp", item.season);
         update_from_storage("anilist_link", item.anilist);
         update_checkbox("auto_rpc", item.auto_rpc);
@@ -406,7 +406,7 @@ document.getElementById("cur_ep_inp").addEventListener("keyup", (e) => {
 })
 
 document.getElementById("total_ep_inp").addEventListener("keyup", (e) => {
-    browser.storage.local.set({ "total_episode": e.target.value })
+    browser.storage.local.set({ "total_episodes": e.target.value })
     update_episode_inp();
 })
 
@@ -422,7 +422,7 @@ document.getElementById("dc_dname_inp").addEventListener("keyup", (e) => {
 })
 
 document.getElementById("dc_uname_inp").addEventListener("keyup", (e) => {
-    pdate_discord_name("user_name", e.target.value)
+    update_discord_name("user_name", e.target.value)
 })
 
 
@@ -468,17 +468,17 @@ document.getElementById("stop_btn").addEventListener("click", () => {
 })
 
 document.getElementById("sync_btn").addEventListener("click", () => {
-    browser.storage.local.get('cur_stream_data').then(
+    browser.storage.local.get('latest_stream').then(
         (item) => {
             // if item is empty
             if (Object.keys(item).length === 0) {
                 show_message("no data available!", "red");
             }
             else {
-                stream_data = item.cur_stream_data;
+                const stream_data = item.latest_stream;
                 browser.storage.local.set({ 'anime': stream_data.anime });
-                browser.storage.local.set({ 'curepisode': stream_data.cur_ep });
-                browser.storage.local.set({ 'totepisode': stream_data.tot_ep });
+                browser.storage.local.set({ 'current_episode': stream_data.current_episode });
+                browser.storage.local.set({ 'total_episodes': stream_data.total_episodes });
                 browser.storage.local.set({ 'season': stream_data.season });
                 update_session();
                 show_message("Synced!", "#5865f2");
