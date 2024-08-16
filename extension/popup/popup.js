@@ -80,6 +80,20 @@ function update_anime_state(state, timeout = 800) {
                                 });
                                 loader.classList.add("hidden");
                                 cover_img.classList.remove("hidden");
+
+                                // if small image is enabled -> set small image to current host logo
+                                browser.storage.local.get('rpc_smallimage').then((item) => {
+                                    const small_img = document.getElementById("small_image");
+                                    if (item.rpc_smallimage === 'enabled') {
+                                        cover_img.classList.add("small-image-mask");
+                                        const host = document.getElementById("cur_host").innerText.toLowerCase();
+                                        small_img.src = document.getElementById(`${host}_logo`).src;
+                                        small_img.classList.remove("hidden");
+                                    } else {
+                                        cover_img.classList.remove("small-image-mask");
+                                        small_img.classList.add("hidden");
+                                    }
+                                }).catch(storage_err)
                             }
                         }
                     }
@@ -208,6 +222,7 @@ function change_host(element, storage_update = false) {
             .then(() => storage_log("hostname", "crunchyroll"))
             .catch(storage_err);
         document.getElementById("host_name").innerText = "Crunchyroll";
+        document.getElementById("small_image").src = document.getElementById("crunchyroll_logo").src;
 
         // no need to update style, as crunchyroll is set as default in the rpc preview
         return;
@@ -223,11 +238,13 @@ function change_host(element, storage_update = false) {
 
     document.querySelector(".item-selected").classList.remove("item-selected")
     element.classList.add("item-selected");
+    const logoId = `${element.innerText.toLowerCase()}_logo`;
+    document.getElementById("small_image").src = document.getElementById(logoId).src;
 
     // if no cover image -> set logo of the selected host as cover
     if (!document.getElementById("cover_image").src.startsWith("https://")) {
         document.querySelectorAll("#asset_holder img").forEach(el => {
-            if (el.id === `${element.innerText.toLowerCase()}_logo`) { el.classList.remove("hidden") }
+            if (el.id === logoId) { el.classList.remove("hidden") }
             else { el.classList.add("hidden") }
         });
     }
@@ -634,8 +651,16 @@ document.getElementById("rpc_smallimage").addEventListener("click", () => {
     browser.storage.local.get('rpc_smallimage').then(
         (item) => {
             console.log(`rpc_smallimage in localstorage was changed. Value before: ${item.rpc_smallimage}`)
-            if (item.rpc_smallimage === 'enabled') { update_checkbox("rpc_smallimage", "disabled") }
-            else { update_checkbox("rpc_smallimage", "enabled") }
+            if (item.rpc_smallimage === 'enabled') {
+                update_checkbox("rpc_smallimage", "disabled")
+                document.getElementById("small_image").classList.add("hidden");
+                document.getElementById("cover_image").classList.remove("small-image-mask");
+            }
+            else {
+                update_checkbox("rpc_smallimage", "enabled");
+                document.getElementById("cover_image").classList.add("small-image-mask");
+                document.getElementById("small_image").classList.remove("hidden");
+            }
         }
     ).catch(storage_err)
 });

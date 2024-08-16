@@ -158,6 +158,19 @@ html {
     object-fit: cover;
 }
 
+.small-image-mask {
+    mask: url("images/streamhosts/asset-mask.svg") no-repeat 50% 50%;
+}
+
+.small-asset {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    position: absolute;
+    bottom: -4px;
+    right: -4px;
+}
+
 .activity-infobox {
     margin-left: 10px;
     overflow: hidden;
