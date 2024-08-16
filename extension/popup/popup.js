@@ -146,7 +146,7 @@ function update_discord_name(type, value) {
         case "display_name":
             value = value ? value : "PhiBi";
             browser.storage.local.set({ "dc_dname": value })
-                .then(r => storage_log("dc_dname", r.dc_dname))
+                .then(() => storage_log("dc_dname", value))
                 .catch(storage_err);
             document.getElementById("dc_dname_inp").value = value;
             document.getElementById("displayname").innerText = value;
@@ -155,7 +155,7 @@ function update_discord_name(type, value) {
         default:
             value = value ? value : "phibiscool";
             browser.storage.local.set({ "dc_uname": value })
-                .then(r => storage_log("dc_uname", r.dc_uname))
+                .then(() => storage_log("dc_uname", value))
                 .catch(storage_err);
             document.getElementById("dc_uname_inp").value = value;
             document.getElementById("username").innerText = value;
@@ -169,10 +169,11 @@ function update_discord_name(type, value) {
 /**
  * Function to toggle the visibility of the host selection menu.
  *
+ * @param {Event|null} _event - Click event to trigger the function. Can be null if the function is called without an event.
  * @param {Boolean} force_close - If true, the host selection menu will be closed regardless of the current state.
  * @returns {void}
  */
-function toggle_host_selection(force_close = false) {
+function toggle_host_selection(_event, force_close = false) {
     const host_selection = document.getElementById("stream_hosts");
     if (force_close) { host_selection.style.display = "none"; return; }
     switch (getComputedStyle(host_selection).display) {
@@ -198,7 +199,7 @@ function change_host(element, storage_update = false) {
     if (storage_update && !element) {
         // if no host is provided in local-storage -> set crunchyroll as default
         browser.storage.local.set({ "hostname": "crunchyroll" })
-            .then(r => storage_log("hostname", r.hostname))
+            .then(() => storage_log("hostname", "crunchyroll"))
             .catch(storage_err);
         document.getElementById("host_name").innerText = "Crunchyroll";
 
@@ -211,7 +212,7 @@ function change_host(element, storage_update = false) {
     document.getElementById("cur_host").innerText = element.innerText;
     document.getElementById("host_name").innerText = element.innerText;
     browser.storage.local.set({ "hostname": element.id })
-        .then(r => storage_log("hostname", r.hostname))
+        .then(() => storage_log("hostname", element.id))
         .catch(storage_err);
 
     document.querySelector(".item-selected").classList.remove("item-selected")
@@ -224,7 +225,7 @@ function change_host(element, storage_update = false) {
             else { el.style.display = "none" }
         });
     }
-    toggle_host_selection(true);
+    toggle_host_selection(null, true);
 }
 
 /**
@@ -278,7 +279,7 @@ function update_checkbox(checkbox, item = "enabled") {
     // Update storage
     storage_json[checkbox] = item;
     browser.storage.local.set(storage_json)
-        .then(r => storage_log(checkbox, r[checkbox]))
+        .then(() => storage_log(checkbox, storage_json[checkbox]))
         .catch(storage_err);
 
 }
@@ -320,7 +321,7 @@ function storage_err(err) {
     // show error-message to popup.js
     show_message("storage error!", "red");
     // log error to console
-    console.error(`[popup.js] Storage-Error: ${err}`);
+    console.error(`[Storage Error] ${err}`);
 }
 
 /**
@@ -417,35 +418,35 @@ function update_session() {
 
 document.getElementById("anime_input").addEventListener("keyup", (e) => {
     browser.storage.local.set({ "anime": e.target.value })
-        .then(r => storage_log("anime", r.anime))
+        .then(() => storage_log("anime", e.target.value))
         .catch(storage_err);
     update_anime_state(e.target.value, 800);
 })
 
 document.getElementById("cur_season_inp").addEventListener("keyup", (e) => {
     browser.storage.local.set({ "season": e.target.value })
-        .then(r => storage_log("season", r.season))
+        .then(() => storage_log("season", e.target.value))
         .catch(storage_err);
     update_season_inp(e.target.value);
 })
 
 document.getElementById("cur_ep_inp").addEventListener("keyup", (e) => {
     browser.storage.local.set({ "current_episode": e.target.value })
-        .then(r => storage_log("current_episode", r.current_episode))
+        .then(() => storage_log("current_episode", e.target.value))
         .catch(storage_err);
     update_episode_inp();
 })
 
 document.getElementById("total_ep_inp").addEventListener("keyup", (e) => {
     browser.storage.local.set({ "total_episodes": e.target.value })
-        .then(r => storage_log("total_episodes", r.total_episodes))
+        .then(() => storage_log("total_episodes", e.target.value))
         .catch(storage_err);
     update_episode_inp();
 })
 
 document.getElementById("anilist_link").addEventListener("keyup", (e) => {
     browser.storage.local.set({ "anilist": e.target.value })
-        .then(r => storage_log("anilist", r.anilist))
+        .then(() => storage_log("anilist", e.target.value))
         .catch(storage_err);
 })
 
@@ -512,16 +513,16 @@ document.getElementById("sync_btn").addEventListener("click", () => {
             else {
                 const stream_data = item.latest_stream;
                 browser.storage.local.set({ 'anime': stream_data.anime })
-                    .then(r => storage_log("anime", r.anime))
+                    .then(() => storage_log("anime", stream_data.anime))
                     .catch(storage_err);
                 browser.storage.local.set({ 'current_episode': stream_data.current_episode })
-                    .then(r => storage_log("current_episode", r.current_episode))
+                    .then(() => storage_log("current_episode", stream_data.current_episode))
                     .catch(storage_err);
                 browser.storage.local.set({ 'total_episodes': stream_data.total_episodes })
-                    .then(r => storage_log("total_episodes", r.total_episodes))
+                    .then(() => storage_log("total_episodes", stream_data.total_episodes))
                     .catch(storage_err);
                 browser.storage.local.set({ 'season': stream_data.season })
-                    .then(r => storage_log("season", r.season))
+                    .then(() => storage_log("season", stream_data.season))
                     .catch(storage_err);
                 update_session();
                 show_message("Synced!", "#5865f2");
