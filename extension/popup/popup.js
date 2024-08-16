@@ -39,6 +39,8 @@ function update_anime_state(state, timeout = 800) {
             if (timeout_id) { clearTimeout(timeout_id) }
 
             timeout_id = setTimeout(() => {
+
+
                 fetch(`https://graphql.anilist.co`, {
                     method: "POST",
                     headers: {
@@ -59,7 +61,7 @@ function update_anime_state(state, timeout = 800) {
                     })
                 }).then(
                     response => {
-                        if (response.ok == true && response.status == 200) { return response.json() }
+                        if (response.ok === true && response.status === 200) { return response.json() }
                         else { throw new Error(`Request status is not ok (Status: ${response.status} | OK: ${response.ok})`) }
                     }
                 ).then(
@@ -82,7 +84,7 @@ function update_anime_state(state, timeout = 800) {
                 )
             }, timeout);
 
-            cover_img.setAttribute("data-timeoutid", timeout_id)
+            cover_img.setAttribute("data-timeoutid", timeout_id.toString())
         }).catch(storage_err)
     }
 }
@@ -94,7 +96,7 @@ function update_anime_state(state, timeout = 800) {
  * @returns {void}
  **/
 function update_season_inp(state) {
-    // if no season is set -> dont show season progress
+    // if no season is set -> don't show season progress
     if (state === '') {
         document.getElementById("season_value").innerText = "";
     }
@@ -133,7 +135,7 @@ function update_episode_inp() {
 }
 
 /**
- * Update discord display or user name in the rpc preview
+ * Update discord display or username in the rpc preview
  *
  * @param {String} type - ...
  * @param {String} value - ...
@@ -143,14 +145,18 @@ function update_discord_name(type, value) {
     switch (type) {
         case "display_name":
             value = value ? value : "PhiBi";
-            browser.storage.local.set({ "dc_dname": value });
+            browser.storage.local.set({ "dc_dname": value })
+                .then(r => storage_log("dc_dname", r.dc_dname))
+                .catch(storage_err);
             document.getElementById("dc_dname_inp").value = value;
             document.getElementById("displayname").innerText = value;
             break;
         case "user_name":
         default:
             value = value ? value : "phibiscool";
-            browser.storage.local.set({ "dc_uname": value });
+            browser.storage.local.set({ "dc_uname": value })
+                .then(r => storage_log("dc_uname", r.dc_uname))
+                .catch(storage_err);
             document.getElementById("dc_uname_inp").value = value;
             document.getElementById("username").innerText = value;
             break;
@@ -182,15 +188,18 @@ function toggle_host_selection(force_close = false) {
 /**
  * Function to change the current host for the rpc. If the function is called by a click event, the host will be changed
  * to the clicked element. If the function is called with the storage_update parameter set to true, the function will
- * set the default host to crunchyroll if no host is set in the local storage.
+ * set the default host to crunchyroll if no host is set in the local storage, else the host needs to be set in the
+ * `element` parameter and the host selection menu will be updated accordingly.
  *
- * @param {Event} element - Click event element to change the host to
+ * @param {Event|HTMLElement|null} element - Click event element to change the host to or HTMLElement loaded from storage
  * @param {Boolean} storage_update - If true, the function will
  */
 function change_host(element, storage_update = false) {
     if (storage_update && !element) {
         // if no host is provided in local-storage -> set crunchyroll as default
-        browser.storage.local.set({ "hostname": "crunchyroll" });
+        browser.storage.local.set({ "hostname": "crunchyroll" })
+            .then(r => storage_log("hostname", r.hostname))
+            .catch(storage_err);
         document.getElementById("host_name").innerText = "Crunchyroll";
 
         // no need to update style, as crunchyroll is set as default in the rpc preview
@@ -201,7 +210,9 @@ function change_host(element, storage_update = false) {
 
     document.getElementById("cur_host").innerText = element.innerText;
     document.getElementById("host_name").innerText = element.innerText;
-    browser.storage.local.set({ "hostname": element.id });
+    browser.storage.local.set({ "hostname": element.id })
+        .then(r => storage_log("hostname", r.hostname))
+        .catch(storage_err);
 
     document.querySelector(".item-selected").classList.remove("item-selected")
     element.classList.add("item-selected");
@@ -209,7 +220,7 @@ function change_host(element, storage_update = false) {
     // if no cover image -> set logo of the selected host as cover
     if (!document.getElementById("cover_image").src.startsWith("https://")) {
         document.querySelectorAll("#asset_holder img").forEach(el => {
-            if (el.id == `${element.innerText.toLowerCase()}_logo`) { el.style.display = "block" }
+            if (el.id === `${element.innerText.toLowerCase()}_logo`) { el.style.display = "block" }
             else { el.style.display = "none" }
         });
     }
@@ -226,7 +237,7 @@ function enable_checkbox(id) {
     const box = document.getElementById(id);
     box.style.backgroundColor = "#5865f2";
     box.style.borderColor = "#5865f2";
-    box.innerHTML = `<img src="images/icons/check.svg" width="20px" height="20px">`
+    box.innerHTML = `<img src="images/icons/check.svg" width="20px" height="20px" alt="x">`
 }
 
 /**
@@ -266,7 +277,10 @@ function update_checkbox(checkbox, item = "enabled") {
 
     // Update storage
     storage_json[checkbox] = item;
-    browser.storage.local.set(storage_json);
+    browser.storage.local.set(storage_json)
+        .then(r => storage_log(checkbox, r[checkbox]))
+        .catch(storage_err);
+
 }
 
 
@@ -293,7 +307,7 @@ function show_message(msg, color) {
     timeout_id = setTimeout(() => {
         document.getElementById("message").style.opacity = "0%";
     }, 2000)
-    document.getElementById("message").setAttribute("data-timeoutid", timeout_id);
+    document.getElementById("message").setAttribute("data-timeoutid", timeout_id.toString());
 }
 
 /**
@@ -307,6 +321,17 @@ function storage_err(err) {
     show_message("storage error!", "red");
     // log error to console
     console.error(`[popup.js] Storage-Error: ${err}`);
+}
+
+/**
+ * Function to log successful storage changes.
+ *
+ * @param {String} key - Key of the storage item that was changed
+ * @param {String} value - New value of the storage item
+ * @returns {void}
+ */
+function storage_log(key, value) {
+    console.log(`[Storage Update] Set ${key} to: ${value}`);
 }
 
 /**
@@ -328,7 +353,7 @@ function checkServerStatus() {
         }
     ).then(
         json => {
-            console.log("Responsed data: ", json)
+            console.log("Responded data: ", json)
             if (json.status === 'ok') {
                 document.getElementById("status_img").src = "images/icons/correct.svg";
                 document.getElementById("status_img").classList.remove("rotating");
@@ -366,7 +391,7 @@ function update_from_storage(element, value) {
 }
 
 /**
- * Update the whole popup page with values from the storage. Usefull to restore the last session at startup.
+ * Update the whole popup page with values from the storage. Useful to restore the last session at startup.
  */
 function update_session() {
     browser.storage.local.get().then((item) => {
@@ -392,26 +417,36 @@ function update_session() {
 
 document.getElementById("anime_input").addEventListener("keyup", (e) => {
     browser.storage.local.set({ "anime": e.target.value })
+        .then(r => storage_log("anime", r.anime))
+        .catch(storage_err);
     update_anime_state(e.target.value, 800);
 })
 
 document.getElementById("cur_season_inp").addEventListener("keyup", (e) => {
     browser.storage.local.set({ "season": e.target.value })
+        .then(r => storage_log("season", r.season))
+        .catch(storage_err);
     update_season_inp(e.target.value);
 })
 
 document.getElementById("cur_ep_inp").addEventListener("keyup", (e) => {
     browser.storage.local.set({ "current_episode": e.target.value })
+        .then(r => storage_log("current_episode", r.current_episode))
+        .catch(storage_err);
     update_episode_inp();
 })
 
 document.getElementById("total_ep_inp").addEventListener("keyup", (e) => {
     browser.storage.local.set({ "total_episodes": e.target.value })
+        .then(r => storage_log("total_episodes", r.total_episodes))
+        .catch(storage_err);
     update_episode_inp();
 })
 
 document.getElementById("anilist_link").addEventListener("keyup", (e) => {
     browser.storage.local.set({ "anilist": e.target.value })
+        .then(r => storage_log("anilist", r.anilist))
+        .catch(storage_err);
 })
 
 
@@ -429,7 +464,7 @@ document.getElementById("dc_uname_inp").addEventListener("keyup", (e) => {
 // Apply click event handlers to buttons of main-page
 
 document.getElementById("stop_btn").addEventListener("click", () => {
-    const datas = {
+    const data = {
         "type": "clear"
     }
 
@@ -439,7 +474,7 @@ document.getElementById("stop_btn").addEventListener("click", () => {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(datas)
+        body: JSON.stringify(data)
     }).then(
         response => {
             if (response.ok === true) { return response.json() }
@@ -447,12 +482,12 @@ document.getElementById("stop_btn").addEventListener("click", () => {
         }
     ).then(
         json => {
-            console.log("Responsed data: ", json)
+            console.log("Responded data: ", json)
             if (typeof json === 'string' || json instanceof String) {
                 // Error from Request (like Internal Server Error)
                 show_message(json, "red");
             } else if (json["processed"] === 'true') {
-                // if Process is true -> request was successfull
+                // if Process is true -> request was successful
                 show_message("Stopped!", "#5865f2");
             } else {
                 // Process is false (not true)
@@ -476,10 +511,18 @@ document.getElementById("sync_btn").addEventListener("click", () => {
             }
             else {
                 const stream_data = item.latest_stream;
-                browser.storage.local.set({ 'anime': stream_data.anime });
-                browser.storage.local.set({ 'current_episode': stream_data.current_episode });
-                browser.storage.local.set({ 'total_episodes': stream_data.total_episodes });
-                browser.storage.local.set({ 'season': stream_data.season });
+                browser.storage.local.set({ 'anime': stream_data.anime })
+                    .then(r => storage_log("anime", r.anime))
+                    .catch(storage_err);
+                browser.storage.local.set({ 'current_episode': stream_data.current_episode })
+                    .then(r => storage_log("current_episode", r.current_episode))
+                    .catch(storage_err);
+                browser.storage.local.set({ 'total_episodes': stream_data.total_episodes })
+                    .then(r => storage_log("total_episodes", r.total_episodes))
+                    .catch(storage_err);
+                browser.storage.local.set({ 'season': stream_data.season })
+                    .then(r => storage_log("season", r.season))
+                    .catch(storage_err);
                 update_session();
                 show_message("Synced!", "#5865f2");
             }
@@ -489,7 +532,7 @@ document.getElementById("sync_btn").addEventListener("click", () => {
 
 document.getElementById("update_btn").addEventListener("click", () => {
     console.log("update")
-    const datas = {
+    const data = {
         "type": "update",
         "host": document.getElementById("host_name").innerText.toLowerCase(),
         "details": document.getElementById("anime_value").innerText,
@@ -498,7 +541,7 @@ document.getElementById("update_btn").addEventListener("click", () => {
     }
 
     if (document.getElementById("cover_image").src.startsWith('https://')) {
-        datas["large_image"] = document.getElementById("cover_image").src;
+        data["large_image"] = document.getElementById("cover_image").src;
     }
 
     fetch("http://127.0.0.1:8000/rpc_anime", {
@@ -507,7 +550,7 @@ document.getElementById("update_btn").addEventListener("click", () => {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(datas)
+        body: JSON.stringify(data)
     }).then(
         response => {
             if (response.ok === true) { return response.json() }
@@ -515,12 +558,12 @@ document.getElementById("update_btn").addEventListener("click", () => {
         }
     ).then(
         json => {
-            console.log("Responsed data: ", json)
+            console.log("Responded data: ", json)
             if (typeof json === 'string' || json instanceof String) {
                 // Error from Request (like Internal Server Error)
                 show_message(json, "red")
             } else if (json["processed"] === 'true') {
-                // if Process is true -> request was successfull
+                // if Process is true -> request was successful
                 show_message("Updated!", "#5865f2")
             } else {
                 // Process is false (not true)
@@ -608,9 +651,9 @@ document.getElementById("arrow_back").addEventListener("click", () => {
 })
 
 document.querySelectorAll(".group-title").forEach(group => {
-    group.addEventListener("click", (elmnt) => {
-        elmnt.target.classList.toggle("group-active");
-        const content = elmnt.target.parentElement.children[1];
+    group.addEventListener("click", (element) => {
+        element.target.classList.toggle("group-active");
+        const content = element.target.parentElement.children[1];
         if (content.style.maxHeight) {
             content.style.maxHeight = null;
             content.style.opacity = "0%";

@@ -64,12 +64,15 @@ browser.runtime.onMessage.addListener(async (data, _sender, _sendResponse) => {
                 console.error('Error fetching cover image: ', error);
                 return;
             }
-            if (resp.status != 200 || resp.ok != true) {
+            if (resp.status !== 200 || resp.ok !== true) {
                 console.error(`Error fetching cover image: (Status: ${resp.status} | OK: ${resp.ok})`);
                 return;
             }
             const resp_obj = await resp.json();
-            data.args.large_image = resp_obj.data.Media.coverImage.large;
+
+            if (resp_obj?.data?.Media?.coverImage?.large) {
+                data.args.large_image = resp_obj.data.Media.coverImage.large;
+            }
         }
 
         console.info("Args: ", data.args);
@@ -92,14 +95,14 @@ function updateRPC(data) {
         body: JSON.stringify(data)
     }).then(
         (response) => {
-            console.log("Responsed data: ", response)
+            console.log("Responded data: ", response)
         }
     )
 }
 
 // function for clearing Presence
 function clearRPC() {
-    const datas = {
+    const data = {
         "type": "clear"
     }
 
@@ -109,10 +112,10 @@ function clearRPC() {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(datas)
+        body: JSON.stringify(data)
     }).then(
         (response) => {
-            console.log("Responsed data: ", response)
+            console.log("Responded data: ", response)
         }
     )
 }
