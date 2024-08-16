@@ -150,7 +150,7 @@ html {
     justify-content: center;
 }
 
-.activity-asset img {
+.asset {
     display: block;
     width: 60px;
     height: 60px;
@@ -535,6 +535,11 @@ html {
 
 .hidden {
     display: none !important;
+}
+
+.dimmed {
+    opacity: 50%;
+    filter: grayscale(80%);
 }
 
 /* Pure CSS loading style for the anime cover by https://codepen.io/nobuakihonma/pen/dYbqLQ */

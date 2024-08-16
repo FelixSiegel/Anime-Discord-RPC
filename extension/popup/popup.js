@@ -40,6 +40,11 @@ function update_anime_state(state, timeout = 800) {
 
             timeout_id = setTimeout(() => {
 
+                const assets = document.querySelectorAll(".asset");
+                assets.forEach(el => { el.classList.add("dimmed") });
+
+                const loader = document.getElementById("cover_loader");
+                loader.classList.remove("hidden");
 
                 fetch(`https://graphql.anilist.co`, {
                     method: "POST",
@@ -69,17 +74,25 @@ function update_anime_state(state, timeout = 800) {
                         if (data?.data?.Media?.coverImage?.large) {
                             cover_img.src = data.data.Media.coverImage.large;
                             cover_img.onload = () => {
+                                assets.forEach(el => {
+                                    el.classList.remove("dimmed");
+                                    el.classList.add("hidden");
+                                });
+                                loader.classList.add("hidden");
                                 cover_img.classList.remove("hidden");
-                                document.getElementById("aniworld_logo").classList.add("hidden");
-                                document.getElementById("crunchyroll_logo").classList.add("hidden");
                             }
                         }
                     }
                 ).catch(
                     err => {
-                        console.error("Error when fetching cover image: ", err.message)
-                        show_message("error loading cover!", "red")
-                        update_anime_state("")
+                        console.error("Error when fetching cover image: ", err.message);
+                        show_message("error loading cover!", "red");
+                        update_anime_state("");
+                        assets.forEach(el => {
+                            el.classList.remove("dimmed");
+                            el.classList.add("hidden");
+                        });
+                        loader.classList.add("hidden");
                     }
                 )
             }, timeout);
@@ -175,11 +188,8 @@ function update_discord_name(type, value) {
  */
 function toggle_host_selection(_event, force_close = false) {
     const host_selection = document.getElementById("stream_hosts");
-    console.log(host_selection)
-    console.log(host_selection.classList, getComputedStyle(host_selection).display)
     if (force_close) { host_selection.classList.add("hidden"); return; }
     host_selection.classList.toggle("hidden");
-    console.log(host_selection.classList, getComputedStyle(host_selection).display)
 }
 
 /**
