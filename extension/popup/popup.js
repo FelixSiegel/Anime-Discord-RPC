@@ -17,12 +17,12 @@ function update_anime_state(state, timeout = 800) {
     if (state === '') {
         document.getElementById("anime_value").innerText = "";
         document.getElementById("cover_image").src = "";
-        document.getElementById("cover_image").style.display = "none";
+        document.getElementById("cover_image").classList.add("hidden");
         browser.storage.local.get('hostname').then((item) => {
             if (item.hostname === 'aniworld') {
-                document.getElementById("aniworld_logo").style.display = "block";
+                document.getElementById("aniworld_logo").classList.remove("hidden");
             } else {
-                document.getElementById("crunchyroll_logo").style.display = "block";
+                document.getElementById("crunchyroll_logo").classList.remove("hidden");
             }
 
         }).catch(storage_err)
@@ -69,9 +69,9 @@ function update_anime_state(state, timeout = 800) {
                         if (data?.data?.Media?.coverImage?.large) {
                             cover_img.src = data.data.Media.coverImage.large;
                             cover_img.onload = () => {
-                                cover_img.style.display = "block";
-                                document.getElementById("aniworld_logo").style.display = "none";
-                                document.getElementById("crunchyroll_logo").style.display = "none";
+                                cover_img.classList.remove("hidden");
+                                document.getElementById("aniworld_logo").classList.add("hidden");
+                                document.getElementById("crunchyroll_logo").classList.add("hidden");
                             }
                         }
                     }
@@ -137,8 +137,8 @@ function update_episode_inp() {
 /**
  * Update discord display or username in the rpc preview
  *
- * @param {String} type - ...
- * @param {String} value - ...
+ * @param {String} type - Type of the discord name to update. Can be "display_name" or "user_name". Default to "user_name".
+ * @param {String} value - Value of the discord name to update the rpc preview with. Default to "phibiscool".
  * @returns {void}
  */
 function update_discord_name(type, value) {
@@ -175,15 +175,11 @@ function update_discord_name(type, value) {
  */
 function toggle_host_selection(_event, force_close = false) {
     const host_selection = document.getElementById("stream_hosts");
-    if (force_close) { host_selection.style.display = "none"; return; }
-    switch (getComputedStyle(host_selection).display) {
-        case "none":
-            host_selection.style.display = "block";
-            break;
-        case "block":
-            host_selection.style.display = "none";
-            break;
-    }
+    console.log(host_selection)
+    console.log(host_selection.classList, getComputedStyle(host_selection).display)
+    if (force_close) { host_selection.classList.add("hidden"); return; }
+    host_selection.classList.toggle("hidden");
+    console.log(host_selection.classList, getComputedStyle(host_selection).display)
 }
 
 /**
@@ -221,8 +217,8 @@ function change_host(element, storage_update = false) {
     // if no cover image -> set logo of the selected host as cover
     if (!document.getElementById("cover_image").src.startsWith("https://")) {
         document.querySelectorAll("#asset_holder img").forEach(el => {
-            if (el.id === `${element.innerText.toLowerCase()}_logo`) { el.style.display = "block" }
-            else { el.style.display = "none" }
+            if (el.id === `${element.innerText.toLowerCase()}_logo`) { el.classList.remove("hidden") }
+            else { el.classList.add("hidden") }
         });
     }
     toggle_host_selection(null, true);
@@ -611,9 +607,9 @@ document.getElementById("rpc_logo").addEventListener("click", () => {
                 document.getElementById("cover_image").src = "";
                 document.querySelectorAll("#asset_holder img").forEach(el => {
                     if (el.id === `${document.getElementById("cur_host").innerText.toLowerCase()}_logo`) {
-                        el.style.display = "block";
+                        el.classList.remove("hidden");
                     }
-                    else { el.style.display = "none"; }
+                    else { el.classList.add("hidden"); }
                 });
             }
             else {

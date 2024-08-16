@@ -5,11 +5,14 @@
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
-body, html {
+body,
+html {
     display: flex;
     flex-direction: row;
     max-width: 325px;
-    margin: 0; padding: 0; border: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
     overflow: hidden;
     background-color: #18191c;
 }
@@ -40,10 +43,14 @@ body, html {
     height: 60px;
     width: 100%;
     background-color: #5865f2;
-    border: 0; margin: 0; padding: 0;
+    border: 0;
+    margin: 0;
+    padding: 0;
 }
 
-.profile-banner:hover #settingsicon { opacity: 100%; }
+.profile-banner:hover #settingsicon {
+    opacity: 100%;
+}
 
 #settingsicon {
     position: absolute;
@@ -72,7 +79,8 @@ body, html {
     width: 90px;
     height: 90px;
     border-radius: 50%;
-    border: 0; outline: 0;
+    border: 0;
+    outline: 0;
 }
 
 .avatar-image {
@@ -248,7 +256,8 @@ body, html {
     border-radius: 3px;
     box-sizing: border-box;
     margin: 6px 5px;
-    padding: 0; outline: none;
+    padding: 0;
+    outline: none;
     transition: all 0.2s;
 }
 
@@ -284,7 +293,9 @@ body, html {
     cursor: pointer;
 }
 
-.value-action_button:last-child {margin-bottom: 0px;}
+.value-action_button:last-child {
+    margin-bottom: 0px;
+}
 
 .selected-item {
     display: flex;
@@ -301,7 +312,7 @@ body, html {
 }
 
 .hosts-itemlist {
-    display: none;
+    display: block;
     position: absolute;
     z-index: 20;
     background-color: #2f3136;
@@ -320,6 +331,7 @@ body, html {
     box-sizing: border-box;
     cursor: pointer;
 }
+
 .chooser-element:hover {
     background-color: #35383d;
 }
@@ -361,6 +373,7 @@ body, html {
 .selected_green img {
     filter: invert(61%) sepia(16%) saturate(1142%) hue-rotate(86deg) brightness(99%) contrast(92%) !important;
 }
+
 .selected_red img {
     filter: invert(42%) sepia(11%) saturate(6254%) hue-rotate(326deg) brightness(84%) contrast(117%) !important;
 }
@@ -401,7 +414,8 @@ body, html {
     box-sizing: border-box;
     font-weight: 700;
     font-size: 18px;
-    margin: 0; padding: 0;
+    margin: 0;
+    padding: 0;
 }
 
 #arrow_back {
@@ -506,131 +520,241 @@ body, html {
 }
 
 @keyframes rotating {
-    from {transform: rotate(0deg)}
-    to {transform: rotate(360deg)}
+    from {
+        transform: rotate(0deg)
+    }
+
+    to {
+        transform: rotate(360deg)
+    }
 }
 
-.rotating {animation: rotating 2s linear infinite;}
+.rotating {
+    animation: rotating 2s linear infinite;
+}
+
+.hidden {
+    display: none !important;
+}
 
 /* Pure CSS loading style for the anime cover by https://codepen.io/nobuakihonma/pen/dYbqLQ */
 
 .loader {
     position: absolute;
-	height: 32px;
-	width: 32px;
-	-webkit-animation: loader-1 2s cubic-bezier(0.770, 0.000, 0.175, 1.000) infinite;
-	        animation: loader-1 2s cubic-bezier(0.770, 0.000, 0.175, 1.000) infinite;
+    height: 32px;
+    width: 32px;
+    -webkit-animation: loader-1 2s cubic-bezier(0.770, 0.000, 0.175, 1.000) infinite;
+    animation: loader-1 2s cubic-bezier(0.770, 0.000, 0.175, 1.000) infinite;
 }
+
 @-webkit-keyframes loader-1 {
-	0%   { -webkit-transform: rotate(0deg); }
-	100% { -webkit-transform: rotate(360deg); }
+    0% {
+        -webkit-transform: rotate(0deg);
+    }
+
+    100% {
+        -webkit-transform: rotate(360deg);
+    }
 }
+
 @keyframes loader-1 {
-	0%   { transform: rotate(0deg); }
-	100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }
+
 .loader::before {
-	content: "";
-	display: block;
-	position: absolute;
-	top: 0; left: 0;
-	bottom: 0; right: auto;
-	margin: auto;
-	width: 8px;
-	height: 8px;
-	background: #5865f2;
-	border-radius: 50%;
-	-webkit-animation: loader-2 2s cubic-bezier(0.770, 0.000, 0.175, 1.000) infinite;
-	        animation: loader-2 2s cubic-bezier(0.770, 0.000, 0.175, 1.000) infinite;
+    content: "";
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: auto;
+    margin: auto;
+    width: 8px;
+    height: 8px;
+    background: #5865f2;
+    border-radius: 50%;
+    -webkit-animation: loader-2 2s cubic-bezier(0.770, 0.000, 0.175, 1.000) infinite;
+    animation: loader-2 2s cubic-bezier(0.770, 0.000, 0.175, 1.000) infinite;
 }
+
 @-webkit-keyframes loader-2 {
-	0%   { -webkit-transform: translate3d(0, 0, 0) scale(1); }
-	50%  { -webkit-transform: translate3d(24px, 0, 0) scale(.5); }
-	100% { -webkit-transform: translate3d(0, 0, 0) scale(1); }
+    0% {
+        -webkit-transform: translate3d(0, 0, 0) scale(1);
+    }
+
+    50% {
+        -webkit-transform: translate3d(24px, 0, 0) scale(.5);
+    }
+
+    100% {
+        -webkit-transform: translate3d(0, 0, 0) scale(1);
+    }
 }
+
 @keyframes loader-2 {
-	0%   { transform: translate3d(0, 0, 0) scale(1); }
-	50%  { transform: translate3d(24px, 0, 0) scale(.5); }
-	100% { transform: translate3d(0, 0, 0) scale(1); }
+    0% {
+        transform: translate3d(0, 0, 0) scale(1);
+    }
+
+    50% {
+        transform: translate3d(24px, 0, 0) scale(.5);
+    }
+
+    100% {
+        transform: translate3d(0, 0, 0) scale(1);
+    }
 }
+
 .loader::after {
-	content: "";
-	display: block;
-	position: absolute;
-	top: 0; left: auto;
-	bottom: 0; right: 0;
-	margin: auto;
-	width: 8px;
-	height: 8px;
-	background: #5865f2;
-	border-radius: 50%;
-	-webkit-animation: loader-3 2s cubic-bezier(0.770, 0.000, 0.175, 1.000) infinite;
-	        animation: loader-3 2s cubic-bezier(0.770, 0.000, 0.175, 1.000) infinite;
+    content: "";
+    display: block;
+    position: absolute;
+    top: 0;
+    left: auto;
+    bottom: 0;
+    right: 0;
+    margin: auto;
+    width: 8px;
+    height: 8px;
+    background: #5865f2;
+    border-radius: 50%;
+    -webkit-animation: loader-3 2s cubic-bezier(0.770, 0.000, 0.175, 1.000) infinite;
+    animation: loader-3 2s cubic-bezier(0.770, 0.000, 0.175, 1.000) infinite;
 }
+
 @-webkit-keyframes loader-3 {
-	0%   { -webkit-transform: translate3d(0, 0, 0) scale(1); }
-	50%  { -webkit-transform: translate3d(-24px, 0, 0) scale(.5); }
-	100% { -webkit-transform: translate3d(0, 0, 0) scale(1); }
+    0% {
+        -webkit-transform: translate3d(0, 0, 0) scale(1);
+    }
+
+    50% {
+        -webkit-transform: translate3d(-24px, 0, 0) scale(.5);
+    }
+
+    100% {
+        -webkit-transform: translate3d(0, 0, 0) scale(1);
+    }
 }
+
 @keyframes loader-3 {
-	0%   { transform: translate3d(0, 0, 0) scale(1); }
-	50%  { transform: translate3d(-24px, 0, 0) scale(.5); }
-	100% { transform: translate3d(0, 0, 0) scale(1); }
+    0% {
+        transform: translate3d(0, 0, 0) scale(1);
+    }
+
+    50% {
+        transform: translate3d(-24px, 0, 0) scale(.5);
+    }
+
+    100% {
+        transform: translate3d(0, 0, 0) scale(1);
+    }
 }
+
 .loader span {
-	display: block;
-	position: absolute;
-	top: 0; left: 0;
-	bottom: 0; right: 0;
-	margin: auto;
-	height: 32px;
-	width: 32px;
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    margin: auto;
+    height: 32px;
+    width: 32px;
 }
+
 .loader span::before {
-	content: "";
-	display: block;
-	position: absolute;
-	top: 0; left: 0;
-	bottom: auto; right: 0;
-	margin: auto;
-	width: 8px;
-	height: 8px;
-	background: #5865f2;
-	border-radius: 50%;
-	-webkit-animation: loader-4 2s cubic-bezier(0.770, 0.000, 0.175, 1.000) infinite;
-	        animation: loader-4 2s cubic-bezier(0.770, 0.000, 0.175, 1.000) infinite;
+    content: "";
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: auto;
+    right: 0;
+    margin: auto;
+    width: 8px;
+    height: 8px;
+    background: #5865f2;
+    border-radius: 50%;
+    -webkit-animation: loader-4 2s cubic-bezier(0.770, 0.000, 0.175, 1.000) infinite;
+    animation: loader-4 2s cubic-bezier(0.770, 0.000, 0.175, 1.000) infinite;
 }
+
 @-webkit-keyframes loader-4 {
-	0%   { -webkit-transform: translate3d(0, 0, 0) scale(1); }
-	50%  { -webkit-transform: translate3d(0, 24px, 0) scale(.5); }
-	100% { -webkit-transform: translate3d(0, 0, 0) scale(1); }
+    0% {
+        -webkit-transform: translate3d(0, 0, 0) scale(1);
+    }
+
+    50% {
+        -webkit-transform: translate3d(0, 24px, 0) scale(.5);
+    }
+
+    100% {
+        -webkit-transform: translate3d(0, 0, 0) scale(1);
+    }
 }
+
 @keyframes loader-4 {
-	0%   { transform: translate3d(0, 0, 0) scale(1); }
-	50%  { transform: translate3d(0, 24px, 0) scale(.5); }
-	100% { transform: translate3d(0, 0, 0) scale(1); }
+    0% {
+        transform: translate3d(0, 0, 0) scale(1);
+    }
+
+    50% {
+        transform: translate3d(0, 24px, 0) scale(.5);
+    }
+
+    100% {
+        transform: translate3d(0, 0, 0) scale(1);
+    }
 }
+
 .loader span::after {
-	content: "";
-	display: block;
-	position: absolute;
-	top: auto; left: 0;
-	bottom: 0; right: 0;
-	margin: auto;
-	width: 8px;
-	height: 8px;
-	background: #5865f2;
-	border-radius: 50%;
-	-webkit-animation: loader-5 2s cubic-bezier(0.770, 0.000, 0.175, 1.000) infinite;
-	        animation: loader-5 2s cubic-bezier(0.770, 0.000, 0.175, 1.000) infinite;
+    content: "";
+    display: block;
+    position: absolute;
+    top: auto;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    margin: auto;
+    width: 8px;
+    height: 8px;
+    background: #5865f2;
+    border-radius: 50%;
+    -webkit-animation: loader-5 2s cubic-bezier(0.770, 0.000, 0.175, 1.000) infinite;
+    animation: loader-5 2s cubic-bezier(0.770, 0.000, 0.175, 1.000) infinite;
 }
+
 @-webkit-keyframes loader-5 {
-	0%   { -webkit-transform: translate3d(0, 0, 0) scale(1); }
-	50%  { -webkit-transform: translate3d(0, -24px, 0) scale(.5); }
-	100% { -webkit-transform: translate3d(0, 0, 0) scale(1); }
+    0% {
+        -webkit-transform: translate3d(0, 0, 0) scale(1);
+    }
+
+    50% {
+        -webkit-transform: translate3d(0, -24px, 0) scale(.5);
+    }
+
+    100% {
+        -webkit-transform: translate3d(0, 0, 0) scale(1);
+    }
 }
+
 @keyframes loader-5 {
-	0%   { transform: translate3d(0, 0, 0) scale(1); }
-	50%  { transform: translate3d(0, -24px, 0) scale(.5); }
-	100% { transform: translate3d(0, 0, 0) scale(1); }
+    0% {
+        transform: translate3d(0, 0, 0) scale(1);
+    }
+
+    50% {
+        transform: translate3d(0, -24px, 0) scale(.5);
+    }
+
+    100% {
+        transform: translate3d(0, 0, 0) scale(1);
+    }
 }
