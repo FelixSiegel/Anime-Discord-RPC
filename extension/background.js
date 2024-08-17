@@ -13,15 +13,16 @@ browser.runtime.onMessage.addListener(async (data, _sender, _sendResponse) => {
     }
 
     else if (data.cmd === 'update') {
+        const storage = await browser.storage.local.get();
 
         // check if auto_streamsync is enabled -> if not use storage value
-        let { auto_streamsync: stream_sync } = await browser.storage.local.get('auto_streamsync');
+        let stream_sync = storage.auto_streamsync;
         if (stream_sync === undefined) {
             await browser.storage.local.set({ "auto_streamsync": "enabled" });
             stream_sync = "enabled";
         }
 
-        let { hostname } = await browser.storage.local.get('hostname');
+        let hostname = storage.hostname;
         if (hostname === undefined) {
             await browser.storage.local.set({ "hostname": "crunchyroll" });
             hostname = "crunchyroll";
@@ -30,8 +31,8 @@ browser.runtime.onMessage.addListener(async (data, _sender, _sendResponse) => {
         // if auto steamsync is disabled use selected host from user
         if (stream_sync === 'disabled') { data.args.host = hostname; }
 
-        // if rpc logo is enabled -> query cover image and
-        let { rpc_logo } = await browser.storage.local.get('rpc_logo');
+        // if rpc logo is enabled -> query cover image
+        let rpc_logo = storage.rpc_logo;
         if (rpc_logo === undefined) {
             await browser.storage.local.set({ "rpc_logo": "enabled" });
             rpc_logo = "enabled";
@@ -72,6 +73,17 @@ browser.runtime.onMessage.addListener(async (data, _sender, _sendResponse) => {
 
             if (resp_obj?.data?.Media?.coverImage?.large) {
                 data.args.large_image = resp_obj.data.Media.coverImage.large;
+
+                // if rpc small image is enabled -> use host logo as small image
+                let small_image = storage.rpc_smallimage;
+                console.log("Small image: ", small_image);
+                if (small_image === undefined) {
+                    await browser.storage.local.set({ "rpc_smallimage": "enabled" });
+                    small_image = "enabled";
+                }
+                if (small_image === 'enabled') {
+                    data.args.small_image = "true";
+                }
             }
         }
 

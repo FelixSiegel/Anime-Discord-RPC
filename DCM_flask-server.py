@@ -55,12 +55,18 @@ def rpc_anime():
             if result.get("large_image"):
                 args["large_image"] = result["large_image"]
                 args["large_text"] = "Image by AniList"
+
+                if result.get("small_image") == "true":
+                    args["small_image"] = result.get("host")
+                    args["small_text"] = f"{result['host']} logo".title()
             else:
                 args["large_image"] = result.get("host")
-                args["large_text"] = f"{result['host']} logo"
+                args["large_text"] = f"{result['host']} logo".title()
 
             # include AniList-Button if link is provided
-            args["buttons"] = [{"label": "My AniList", "url": result["anilist"]}] if result.get("anilist") else None
+            args["buttons"] = (
+                [{"label": "My AniList", "url": anilist_url}] if (anilist_url := result.get("anilist")) else None
+            )
 
             if rpc is not None:
                 try:
@@ -91,6 +97,8 @@ def rpc_anime():
                 rpc.update(
                     large_image=args["large_image"],
                     large_text=args["large_text"],
+                    small_image=args.get("small_image"),
+                    small_text=args.get("small_text"),
                     details=args["details"],
                     state=args["state"],
                     start=args["start"],

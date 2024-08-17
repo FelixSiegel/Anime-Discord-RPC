@@ -427,7 +427,7 @@ function update_session() {
         update_from_storage("anilist_link", item.anilist);
         update_checkbox("auto_rpc", item.auto_rpc);
         update_checkbox("rpc_logo", item.rpc_logo);
-        update_checkbox("rpc_smallimage", item.rpc_details);
+        update_checkbox("rpc_smallimage", item.rpc_smallimage);
         update_checkbox("auto_streamsync", item.auto_streamsync);
         update_discord_name("display_name", item.dc_dname);
         update_discord_name("user_name", item.dc_uname);
@@ -557,15 +557,19 @@ document.getElementById("sync_btn").addEventListener("click", () => {
 document.getElementById("update_btn").addEventListener("click", () => {
     console.log("update")
     const data = {
-        "type": "update",
-        "host": document.getElementById("host_name").innerText.toLowerCase(),
-        "details": document.getElementById("anime_value").innerText,
-        "state": document.getElementById("progress").innerText.replace("\n", ""),
-        "anilist": document.getElementById("anilist_link").value
+        type: "update",
+        host: document.getElementById("host_name").innerText.toLowerCase(),
+        details: document.getElementById("anime_value").innerText,
+        state: document.getElementById("progress").innerText.replace("\n", ""),
+        anilist: document.getElementById("anilist_link").value,
     }
 
     if (document.getElementById("cover_image").src.startsWith('https://')) {
         data["large_image"] = document.getElementById("cover_image").src;
+    }
+
+    if (document.getElementById("small_image").classList.contains("hidden") === false) {
+        data["small_image"] = "true";
     }
 
     fetch("http://127.0.0.1:8000/rpc_anime", {
