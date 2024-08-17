@@ -26,11 +26,14 @@
                 <div class="activity-header">playing a game</div>
                 <div class="activity-body">
                     <div id="asset_holder" class="activity-asset">
-                        <img id="crunchyroll_logo" src="images/streamhosts/crunchyroll.png" title="Logo">
-                        <img id="aniworld_logo" src="images/streamhosts/aniworld.png" title="Logo" style="display: none;">
+                        <div id="cover_loader" class="loader hidden"><span></span></div>
+                        <img id="crunchyroll_logo" src="images/streamhosts/crunchyroll.png" title="Logo" class="asset">
+                        <img id="aniworld_logo" src="images/streamhosts/aniworld.png" title="Logo" class="asset hidden">
+                        <img id="cover_image" src="" title="Logo" class="asset hidden" data-timeoutid="">
+                        <img id="small_image" src="" title="Host" class="small-asset hidden">
                     </div>
                     <div class="activity-infobox">
-                        <div class="activity-info" id="host_name">Crunhyroll</div>
+                        <div class="activity-info" id="host_name">Crunchyroll</div>
                         <div class="activity-info" id="anime_value"></div>
                         <div class="activity-info" id="progress">
                             <span id="progress_value" style="float: left;"></span>
@@ -72,7 +75,7 @@
                             </path></svg>
                         </div>
                     </div>
-                    <div id="stream_hosts" class="hosts-itemlist" >
+                    <div id="stream_hosts" class="hosts-itemlist hidden" >
                         <div id="crunchyroll" class="host-item item-selected">Crunchyroll</div>
                         <div id="aniworld" class="host-item">AniWorld</div>
                     </div>
@@ -133,6 +136,30 @@
                 </div>
             </div>
             <div class="settings-group">
+                <div class="group-title">RPC Details</div>
+                <div class="group-content">
+                    <div class="value-box">
+                        <div class="question">
+                            <div id="rpc_logo" class="value-checkbox" type="checkbox"></div>
+                            <div>Use Anime-Cover</div>
+                        </div>
+                        <div class="value-description" data-for="rpc_logo">
+                            If enabled, the cover of the anime will be used as the RPC image.
+                            If disabled or cover isn't available, the logo of the streamhost will be used.
+                            Covers are powered by <a href="https://anilist.co">AniList</a>.
+                        </div>
+                        <div class="question">
+                            <div id="rpc_smallimage" class="value-checkbox" type="checkbox"></div>
+                            <div>Streamhost as small image</div>
+                        </div>
+                        <div class="value-description" data-for="rpc_smallimage">
+                            If enabled, the logo of the streamhost will be added as a small image to the RPC.
+                            (Shown in the bottom right corner)
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="settings-group">
                 <div class="group-title">Server</div>
                 <div class="group-content">
                     <div class="value-box">
@@ -146,7 +173,7 @@
                     </div>
                     <div class="value-box">
                         <div class="value-header">help</div>
-                        <a class="value-action_button" style="background-color: #4f545c;" href="https://github.com/FelixSiegel/Discord-RPC">Lern more!</a>
+                        <a class="value-action_button" style="background-color: #4f545c;" href="https://github.com/FelixSiegel/Discord-RPC">Learn more!</a>
                     </div>
                 </div>
             </div>

@@ -5,39 +5,38 @@ Created on Tue Sep 20 18:40:56 2022
 
 @author: Revox179
 """
+
 import sys
-from requests import request
-from pypresence import Presence
 import time
-from flask import *
-from flask_cors import CORS
 import socket
 import asyncio
 
+from pypresence import Presence
+from flask import Flask, render_template, jsonify, request
+from flask_cors import CORS
+
 PORT = 8000
-APPLICATION_IDs = {
-    'aniworld': '1020359247059497071',
-    'crunchyroll': '1076049094281277531'
-}
-rpc = None
+APPLICATION_IDs = {"aniworld": "1020359247059497071", "crunchyroll": "1076049094281277531"}
 
 app = Flask(__name__)
 CORS(app, resources={r"/rpc_anime": {"origins": "*"}})
 CORS(app, resources={r"/status": {"origins": "*"}})
+
 shutdown = False
+rpc = None
 
 
-@app.route('/')
+@app.route("/")
 def home():
-    return render_template('home.html')
+    return render_template("home.html")
 
 
-@app.route('/rpc')
+@app.route("/rpc")
 def rpc_default():
-    return render_template('rpc_default.html')
+    return render_template("rpc_default.html")
 
 
-@app.route('/rpc_anime', methods=['POST', 'GET'])
+@app.route("/rpc_anime", methods=["POST", "GET"])
 def rpc_anime():
     global rpc
     if request.method == "POST":
@@ -46,46 +45,66 @@ def rpc_anime():
         if result["type"] == "update":
             print("\033[92m[INFO]:\033[00m Updating-Request received")
             # args include all parameter for the rpc.update()-Function
-            args = [
-                result["host"],
-                f"{result['host']} logo",
-                result["details"],
-                result["state"],
-                int(time.time())
-            ]
+            args = {}
+            args["host"] = result.get("host")
+            args["details"] = result.get("details")
+            args["state"] = result.get("state")
+            args["start"] = int(time.time())
+
+            # if provided, include image and text for large_image else use host as large_image
+            if result.get("large_image"):
+                args["large_image"] = result["large_image"]
+                args["large_text"] = "Image by AniList"
+
+                if result.get("small_image") == "true":
+                    args["small_image"] = result.get("host")
+                    args["small_text"] = f"{result['host']} logo".title()
+            else:
+                args["large_image"] = result.get("host")
+                args["large_text"] = f"{result['host']} logo".title()
+
             # include AniList-Button if link is provided
-            args.append(None if result["anilist"] == "" else [{"label": "My AniList", "url": result["anilist"]}])
+            args["buttons"] = (
+                [{"label": "My AniList", "url": anilist_url}] if (anilist_url := result.get("anilist")) else None
+            )
 
             if rpc is not None:
                 try:
                     rpc.clear()
                     rpc.close()
                     rpc = None
-                    print(f"\033[92m[INFO]:\033[00m Closed connection to Disord RPC with {result['host']}")
+                    print(f"\033[92m[INFO]:\033[00m Closed connection to Disord RPC with {args['host']}")
                 except Exception:
                     print("\033[91m[ERROR]:\033[00m No connection to Discord Gateway...")
-            
-            if result["host"] in APPLICATION_IDs:
+
+            if args["host"] not in APPLICATION_IDs:
+                print(f"\033[91m[ERROR]:\033[00m No valid Host: {result['host']}")
+                return jsonify({"processed": "false"})
+
+            elif not args["details"] and not args["state"]:
+                print("\033[91m[ERROR]:\033[00m No valid Details or State provided")
+                return jsonify({"processed": "false"})
+
+            else:
                 # create new event loop for rpc
                 loop = asyncio.new_event_loop()
                 asyncio.set_event_loop(loop)
 
                 # start new rpc connection and update it with values from args
-                rpc = Presence(APPLICATION_IDs[result["host"]], loop=loop)
+                rpc = Presence(APPLICATION_IDs[args["host"]], loop=loop)
                 rpc.connect()
-                print(f"\033[92m[INFO]:\033[00m Connected to Disord RPC with {result['host']}")
+                print(f"\033[92m[INFO]:\033[00m Connected to Disord RPC with {args['host']}")
                 rpc.update(
-                    large_image=args[0],
-                    large_text=args[1],
-                    details=args[2],
-                    state=args[3],
-                    start=args[4],
-                    buttons=args[5]
+                    large_image=args["large_image"],
+                    large_text=args["large_text"],
+                    small_image=args.get("small_image"),
+                    small_text=args.get("small_text"),
+                    details=args["details"],
+                    state=args["state"],
+                    start=args["start"],
+                    buttons=args["buttons"],
                 )
-                print(f"\033[92m[INFO]:\033[00m Started Disord RPC with {result['host']}")
-            else:
-                print(f"\033[91m[ERROR]:\033[00m No valid Host: {result['host']}")
-                return jsonify({'processed': 'false'})
+                print(f"\033[92m[INFO]:\033[00m Started Disord RPC with {args['host']}")
 
         elif result["type"] == "clear":
             print("\033[92m[INFO]:\033[00m Clear-Request received")
@@ -99,17 +118,19 @@ def rpc_anime():
                     print("\033[91m[ERROR]:\033[00m No connection to Discord Gateway...")
             else:
                 print("\033[92m[INFO]:\033[00m No known running RPC-Connection to close")
-        else: 
+        else:
             print("\033[91m[ERROR]:\033[00m Request with no valid/known Type received")
-            return jsonify({'processed': 'false'})
+            return jsonify({"processed": "false"})
 
-        return jsonify({'processed': 'true'})
-    return render_template('rpc_anime.html')
+        return jsonify({"processed": "true"})
+    return render_template("rpc_anime.html")
+
 
 # Route to check status of server from Firefox-Extension
-@app.route("/status", methods=['POST'])
+@app.route("/status", methods=["POST"])
 def status():
-    return jsonify({'status': 'ok'})
+    return jsonify({"status": "ok"})
+
 
 # Shutdown Flask Server -> Solution worked fine found here
 # https://stackoverflow.com/questions/15562446/how-to-stop-flask-application-without-using-ctrl-c#answer-69812984
@@ -119,19 +140,23 @@ def exit_app():
     shutdown = True
     return "Shutdown..."
 
+
 @app.teardown_request
 def teardown(_):
     import os
+
     if shutdown:
         print("\033[91m[STOPPED]:\033[00m Shutdown Server")
         os._exit(0)
+
 
 # Function to check if port is already in use
 def check_port(port: int) -> bool:
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         return s.connect_ex(("localhost", port)) == 0
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     if check_port(PORT):
         print(f"\033[91m[ERROR]:\033[00m Port {PORT} is already in use")
         sys.exit(1)
