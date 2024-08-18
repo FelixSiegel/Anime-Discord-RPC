@@ -22,11 +22,12 @@ let wasAudibleBefore = false
  */
 async function communicateToBackground(host, anime, episode_details) {
     try {
-        const response = await browser.runtime.sendMessage({cmd: "check"});
+        const response = await browser.runtime.sendMessage({ cmd: "check" });
         console.info("Playing_state: ", response);
 
         if (response && !wasAudibleBefore) {
-            const {anilist: anilist_url = ""} = await browser.storage.local.get("anilist");
+            const { anilist: anilist_url = "" } = await browser.storage.local.get("anilist");
+            const { activity_type = "watching" } = await browser.storage.local.get("activity_type");
 
             const messageArgs = {
                 cmd: "update",
@@ -35,13 +36,14 @@ async function communicateToBackground(host, anime, episode_details) {
                     host: host,
                     details: anime,
                     state: episode_details,
-                    anilist: anilist_url
+                    anilist: anilist_url,
+                    activity_type: activity_type
                 }
             };
 
             await browser.runtime.sendMessage(messageArgs);
         } else if (!response && wasAudibleBefore) {
-            await browser.runtime.sendMessage({cmd: "clear"});
+            await browser.runtime.sendMessage({ cmd: "clear" });
         }
 
         wasAudibleBefore = response;
@@ -66,9 +68,9 @@ async function communicateToBackground(host, anime, episode_details) {
 async function checkAnimePlaying(host, anime, episode_details) {
     const checkAutoRpcStatus = async () => {
         try {
-            let {auto_rpc} = await browser.storage.local.get('auto_rpc');
+            let { auto_rpc } = await browser.storage.local.get('auto_rpc');
             if (auto_rpc === undefined) {
-                await browser.storage.local.set({"auto_rpc": "enabled"});
+                await browser.storage.local.set({ "auto_rpc": "enabled" });
                 auto_rpc = "enabled";
             }
             return auto_rpc;
@@ -190,12 +192,12 @@ window.onbeforeunload = () => {
     browser.storage.local.get('auto_rpc').then(
         async (item) => {
             if (item.auto_rpc === undefined) {
-                await browser.storage.local.set({"auto_rpc": "enabled"})
+                await browser.storage.local.set({ "auto_rpc": "enabled" })
                 item.auto_rpc = 'enabled';
             }
 
             if (item.auto_rpc === 'enabled') {
-                await browser.runtime.sendMessage({"cmd": "clear"})
+                await browser.runtime.sendMessage({ "cmd": "clear" })
             }
         }
     )

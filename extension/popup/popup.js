@@ -616,6 +616,7 @@ document.getElementById("update_btn").addEventListener("click", () => {
         details: document.getElementById("anime_value").innerText,
         state: document.getElementById("progress").innerText.replace("\n", ""),
         anilist: document.getElementById("anilist_link").value,
+        activity_type: document.getElementById("presence_activity").getAttribute("data-ptype") || "watching"
     }
 
     if (document.getElementById("cover_image").src.startsWith('https://')) {

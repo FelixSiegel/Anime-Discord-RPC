@@ -11,7 +11,7 @@ import time
 import socket
 import asyncio
 
-from pypresence import Presence
+from pypresence import Presence, ActivityType
 from flask import Flask, render_template, jsonify, request
 from flask_cors import CORS
 
@@ -50,6 +50,7 @@ def rpc_anime():
             args["details"] = result.get("details")
             args["state"] = result.get("state")
             args["start"] = int(time.time())
+            args["activity_type"] = result.get("activity_type")
 
             # if provided, include image and text for large_image else use host as large_image
             if result.get("large_image"):
@@ -103,6 +104,8 @@ def rpc_anime():
                     state=args["state"],
                     start=args["start"],
                     buttons=args["buttons"],
+                    activity_type=ActivityType.PLAYING if args["activity_type"] == "playing" else ActivityType.WATCHING
+
                 )
                 print(f"\033[92m[INFO]:\033[00m Started Disord RPC with {args['host']}")
 
@@ -118,6 +121,7 @@ def rpc_anime():
                     print("\033[91m[ERROR]:\033[00m No connection to Discord Gateway...")
             else:
                 print("\033[92m[INFO]:\033[00m No known running RPC-Connection to close")
+
         else:
             print("\033[91m[ERROR]:\033[00m Request with no valid/known Type received")
             return jsonify({"processed": "false"})
