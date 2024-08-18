@@ -22,6 +22,7 @@ browser.runtime.onMessage.addListener(async (data, _sender, _sendResponse) => {
             stream_sync = "enabled";
         }
 
+        // use hostname from storage if not set -> use crunchyroll
         let hostname = storage.hostname;
         if (hostname === undefined) {
             await browser.storage.local.set({ "hostname": "crunchyroll" });
@@ -30,6 +31,18 @@ browser.runtime.onMessage.addListener(async (data, _sender, _sendResponse) => {
 
         // if auto steamsync is disabled use selected host from user
         if (stream_sync === 'disabled') { data.args.host = hostname; }
+
+        let activity_type = storage.activity_type;
+        if (activity_type === undefined) {
+            await browser.storage.local.set({ "activity_type": "watching" });
+            activity_type = "watching";
+        }
+
+        // if activity type is playing -> add "Watching" to details
+        const anime = data.args.details;
+        if (activity_type === 'playing') {
+            data.args.details = `Watching ${anime}`;
+        }
 
         // if rpc logo is enabled -> query cover image
         let rpc_logo = storage.rpc_logo;
@@ -57,16 +70,21 @@ browser.runtime.onMessage.addListener(async (data, _sender, _sendResponse) => {
                             }
                         }`,
                         variables: {
-                            title: data.args.details
+                            title: anime
                         }
                     })
                 })
             } catch (error) {
                 console.error('Error fetching cover image: ', error);
+                console.info("Args: ", data.args);
+                updateRPC(data.args);
                 return;
             }
+
             if (resp.status !== 200 || resp.ok !== true) {
                 console.error(`Error fetching cover image: (Status: ${resp.status} | OK: ${resp.ok})`);
+                console.info("Args: ", data.args);
+                updateRPC(data.args);
                 return;
             }
             const resp_obj = await resp.json();
@@ -76,7 +94,6 @@ browser.runtime.onMessage.addListener(async (data, _sender, _sendResponse) => {
 
                 // if rpc small image is enabled -> use host logo as small image
                 let small_image = storage.rpc_smallimage;
-                console.log("Small image: ", small_image);
                 if (small_image === undefined) {
                     await browser.storage.local.set({ "rpc_smallimage": "enabled" });
                     small_image = "enabled";
