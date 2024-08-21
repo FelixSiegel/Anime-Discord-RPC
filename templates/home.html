@@ -23,7 +23,9 @@
             <a class="menu-item shutdown" href="/exit">Exit Server</a>
         </div>
     </div>
-    <div class="content-field"></div>
+    <div class="content-field">
+        {{ readme_content|safe }}
+    </div>
 </body>
 
 </html>

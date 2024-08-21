@@ -11,8 +11,9 @@ import time
 import socket
 import asyncio
 
+import markdown
 from pypresence import Presence, ActivityType
-from flask import Flask, render_template, jsonify, request
+from flask import Flask, render_template, jsonify, request, url_for, send_from_directory
 from flask_cors import CORS
 
 PORT = 8000
@@ -28,7 +29,16 @@ rpc = None
 
 @app.route("/")
 def home():
-    return render_template("home.html")
+    with open("README.md", "r") as f:
+        readme = f.read()
+        readme = readme.replace("doc_images/", url_for("serve_image", filename="") + "/")
+        html = markdown.markdown(readme, extensions=["tables", "fenced_code"])
+    return render_template("home.html", readme_content=html)
+
+
+@app.route("/doc_images/<path:filename>")
+def serve_image(filename):
+    return send_from_directory("doc_images", filename)
 
 
 @app.route("/rpc")
@@ -55,7 +65,7 @@ def rpc_anime():
             # if provided, include image and text for large_image else use host as large_image
             if result.get("large_image"):
                 args["large_image"] = result["large_image"]
-                args["large_text"] = "Image by AniList"
+                args["large_text"] = "Cover by AniList"
 
                 if result.get("small_image") == "true":
                     args["small_image"] = result.get("host")
@@ -104,8 +114,7 @@ def rpc_anime():
                     state=args["state"],
                     start=args["start"],
                     buttons=args["buttons"],
-                    activity_type=ActivityType.PLAYING if args["activity_type"] == "playing" else ActivityType.WATCHING
-
+                    activity_type=ActivityType.PLAYING if args["activity_type"] == "playing" else ActivityType.WATCHING,
                 )
                 print(f"\033[92m[INFO]:\033[00m Started Disord RPC with {args['host']}")
 
@@ -161,10 +170,10 @@ def check_port(port: int) -> bool:
 
 
 if __name__ == "__main__":
-    if check_port(PORT):
-        print(f"\033[91m[ERROR]:\033[00m Port {PORT} is already in use")
-        sys.exit(1)
+    # if check_port(PORT):
+    #     print(f"\033[91m[ERROR]:\033[00m Port {PORT} is already in use")
+    #     sys.exit(1)
 
     print("\033[92m[INFO]:\033[00m Start Flask server on port 8000")
-    app.run(port=PORT)
+    app.run(port=PORT, debug=True)
     print("\033[91m[STOPPED]:\033[00m Shutdown Server")
