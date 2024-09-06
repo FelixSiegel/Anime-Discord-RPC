@@ -568,7 +568,7 @@ document.getElementById("stop_btn").addEventListener("click", () => {
                 // if Process is true -> request was successful
                 show_message("Stopped!", "#5865f2");
             } else {
-                // Process is false (not true)
+                // Process is false
                 show_message("invalid request!", "red");
             }
         }
@@ -649,7 +649,7 @@ document.getElementById("update_btn").addEventListener("click", () => {
                 // if Process is true -> request was successful
                 show_message("Updated!", "#5865f2")
             } else {
-                // Process is false (not true)
+                // Process is false
                 show_message("invalid request!", "red")
             }
         }

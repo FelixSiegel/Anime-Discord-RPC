@@ -1,111 +1,148 @@
 # Anime Discord RPC
 
-This project, enables a rich presence display in Discord when watching anime. With the help of a Firefox addon, you get additional possibilities, such as an automatic display of the Rich Presence.
+Show everyone on discord which anime you are watching with just a few clicks and a few buttons. With an optional browser add-on, you have the option of automatically recognising what you are currently viewing*.
 
-## How it works
+*\*Due to discord-side limitations, the browser addon cannot run on its own and still requires the local server as a bridge device. Read more about it in [how it works](#how-it-works).*
 
-### Server
+## Features
 
-The project consists of two main parts. The first, and most important, is the Python program (`DCM_flask-server.py`), which provides a small local server using [Flask](https://flask.palletsprojects.com/en/2.3.x/) at the address `localhost:8000`. Various options are available via this server.  
-
-If the server could be started, the address should be accessible in the browser and the start page with the documentation should appear. There are also other pages available. Among others, `localhost:8000/rpc`, which is a feature not yet implemented, but above all the route `http://localhost:8000/rpc_anime`.  
-
-Under this route, various options are now available to set and start your individual display for anime, as well as to stop it.  
-While you are making settings or changing values, you will be shown how it will look on Discord.
-
-![Example](doc_images/doc_1.png)
-
-The **Update** button starts the display with the entered values. The **Clear** button ends the display, but the entered values remain. For both buttons, a short message appears if everything has worked. If there is none, something has gone wrong.
-
-The server can be terminated via 'Exit Server'. This will end all displays that are currently running.
-
-### Firedox Add-On
-
-With the optional [Add-On](https://addons.mozilla.org/en-US/firefox/addon/anime-discord-rpc1/?utm_source=addons.mozilla.org&utm_medium=referral&utm_content=search), which is currently only available for Firefox, the display can be simplified and even more options are available.  
-
-If the add-on has been successfully installed, the same options are available via the pop-up menu as via the server pages. However, you have to make sure that **the server is still running, as it is currently not possible to start the display directly from the browser, so a background server is always necessary for communication with the Discord gateway!** !
-
-![Extension-Example](doc_images/doc_2.png)
-
-The following options are available via the buttons at the bottom (from left to right):
-
-1. Clear/Stop the display.
-2. Synchronise the values with the last stream. That means, if available, the values from the last video you watched on the [supported websites](#currently-supported-websitesstream-hosts) are automatically entered into the fields.
-3. Start the display. Starts a rich presence with the currently entered values. (As far as [possible](#notes-for-starting-a-display-rich-presence))
-
-**Possible error displays:**
-
-Error | Meaning
---- | ---
-**REQUESTING SERVER FAILED!** | The server could not be reached. This is usually because the server is not running. If you start the server via `DCM_flask-server` it should work.
-**INTERNAL SERVER ERROR!** | This error means that the server can be reached, but an error has occurred internally. This can be due to the fact that the entered values are not correct or Discord is not accessible.
-**NO DATA AVAILABLE!** | This can occur if you have not watched any anime (on the [supported sites](#currently-supported-websitesstream-hosts)) or if the last values of the stream are no longer available due to a restart.
-
-Various actions can be performed in the settings of the pop-up menu.  
-
-![Settingsmenu](doc_images/doc_3.png
-)
-
-The users displayname and the username (previously discriminator) can be entered in the **layout section**. However, this is only relevant for the design of the local display of the add-on and has no effect on the display on Discord.  
-
-The possibility of **Auto-RPC** means that a display is automatically started when you watch anime on one of the [supported sites](#currently-supported-websitesstream-hosts), or is automatically stopped when you stop watching. Logically, the values of the current stream are used and not those entered.  
-This can be activated or deactivated via the option 'Enable Auto RPC'.  
-With the option `Use streamhost from watching` you can determine whether the stream host on which you are currently watching should be used for the automatic display. If this option is deactivated, the stream host set in the pop-up is used.  
-
-In the **Server** section, the current status of the server can be viewed. With `Server is running!` all is well, the server can be contacted successfully. With `Server can't be accessed!` a problem has occurred with the connection to the server. In this case you should check whether the server is running or whether the address is already being used by another programme. With `Check Status` the connection can be tested again. With `Shutdown Server` the server can be shut down, but this only has an effect in the case of *Server is running!*.
-
-### Notes for starting a display (Rich Presence)
-
-When starting a display/Rich Presence (RPC), some values are mandatory and will lead to an error if they are not specified.  
-
-Values that must always be specified:  
-`Anime`
-
-Values of which at least one must be specified:  
-`Current episode`  
-`Season`
-
-All other values are optional. Here is an overview of all values:
-
-Value | Description | Required
---- | --- | ---
-`Anime` | Stands for the title of the anime (for example Attack on Titan) | yes
-`Current episode` | Indicates the episode currently being watched | yes, if season not specified 
-`Episodes total` | Indicates the number of episodes in the current season | no
-`Season` | Indicates the current season being watched. | yes, if Current episode is not specified
-`Stream host` | Select the stream host you are using to watch. If your host is not listed, feel free to suggest it for the next update. | Yes
-`Anilist` | If you have an account with a provider like [AniList](https://anilist.co/) or [MyAnimeList](https://myanimelist.net/), you can enter a link which can then be opened by others in Discord via a button. However, please observe Discord's [guidelines](https://support.discord.com/hc/en-us/sections/115000344951-Privacy-and-Policy) when providing a link. | no
-
-### Currently supported websites/stream hosts
-
-- [www.crunchyroll.com](https://www.crunchyroll.com/)
-- [aniworld.to](https://aniworld.to/) (:warning: Use at own risk!)
+- [x] Set your anime progress as discord rich presence (RPC) *(See [set your presence](#set-your-presence) for value options)*
+- [x] Selection of multiple streaming hosters *(See [supported hosters](#currently-supported-stream-hoster))*
+- [x] Choose between `Watching` and `Playing` as activity type *(See [set your presence](#set-your-presence) for more details)*
+- [x] Get cover images for the current anime, set as large image of the presence (Images by [AniList](https://anilist.co/))
+- [x] Use the Firefox-Addon including all of the above functionality in an easy to use way directly within you browser and with some extra functionality like automatically recognition of current anime streams you watch *(See [Advantages of the firefox addon](#advantages-of-the-firefox-addon) to learn more)*
 
 ## Installation
 
-### Standard installation
+First of all you need to setup the local server. The server includes the rich presence connection pipe to discord and a webpage to easily start, edit and stop your rich presence. Read the section about [how it works](#how-it-works) for more detailed information.
 
-To install the latest version you can find several files on GitHub [Releases](https://github.com/Revox179/Anime-Discord-RPC/releases). If you use Windows you need the `DCM-flask_server.exe` and under Linux `DCM-flask_server`.  
-After downloading the file, under Linux you still need to mark the file as executable and otherwise just run it normally. To check whether the file has started, simply call `localhost:8000` in the browser. If the website is accessible, everything has worked. Alternatively, the file can also be started from the terminal to get an output that allows for better troubleshooting.  
+### Install packed server executable
 
-The add-on can be installed from [here](https://addons.mozilla.org/en-US/firefox/addon/anime-discord-rpc1/?utm_source=addons.mozilla.org&utm_medium=referral&utm_content=search) in Firefox.
+To get the server in one executable file, go to the [release tab](https://github.com/Revox179/Anime-Discord-RPC/releases/latest) and download the file that fits your system:
 
+- Windows: `rpc_bridge_server.exe`
+- Linux: `rpc_bridge_server`
 
-### Installing from source code
+After downloading just double click the file to start it. If all succeed, you should be able to visit [http://127.0.0.1:8000](http://127.0.0.1:8000) in your browser of choice and start your rich presence.
 
-To use the project from the source code, the repository must first be downloaded from GitHub. To start the server, you also need Python on your computer. If these requirements are met, the following Python packages must be installed via pip:
+See [troubleshoot](#troubleshoot) if you can't get the server running or your rpc won't start.
 
+### Install and run server from source
+
+If you want to run the server from source, you can do this by either downloading the whole project source code or downloading only [`Server_SourceCode.zip`](https://github.com/Revox179/Anime-Discord-RPC/releases/latest/download/DCM_flask-server) and unzip the file. Go to the root directory of the project and install the required python libaries by typing into your terminal:
+
+```sh
+python3 -m pip install -r requirements.txt
 ```
-pip install requests
-pip install pypresence
-pip install Flask
-pip install Flask-Cors
-pip install pyinstaller
+
+*Note: you need at least [python version 3.8](https://www.python.org/downloads/release/python-380/) or [higher](https://www.python.org/downloads/) installed to run this.*
+
+If all is successfully installed you can start the server by typing the following into you terminal prompt:
+
+```sh
+python3 rpc_bridge_server.py
 ```
 
-Now the file `DCM-flask_server.py` can be executed with Python. If everything runs properly, you should have received the following output, indicating that the server has been started successfully:
+If everything runs properly, you should get the following output, indicating that the server has been started successfully:
 
-![Pythonoutput](doc_images/doc_4.png)
+![Proper server start](doc_images/proper_server_start.png)
 
-The Firefox addon can also be installed from the source code, but then it has the limitation that it is not permanently installed, but is automatically uninstalled every time the browser is closed.  
-To install it in Firefox, you must first open the [debug page](about:debugging#/runtime/this-firefox) for Firefox addons. Here you now have the option `Load Temporary Add-on`, via which you select and load the file `manifest.json` in the `extension` folder of the repository. Now the add-on should be successfully loaded for the current session.
+You can now go to [http://127.0.0.1:8000](http://127.0.0.1:8000) in your browser of choice and start your rich presence.
+
+See [troubleshoot](#troubleshoot) if you encounter any problems.
+
+### Install additional Firefox-AddOn
+
+This step is optional but offers some useful features like automatic recognition if you watch anime in your browser. See [Advantages of the Firefox addon](#advantages-of-the-firefox-addon).
+
+You can download the addon from official extension hub of Firefox: [https://addons.mozilla.org/en-US/firefox/addon/anime-rpc/](https://addons.mozilla.org/en-US/firefox/addon/anime-rpc/)
+
+*Currently only Firefox is supported. Perhaps support for Chrome or Chrome-based browsers will come too, but there is no guarantee.*
+
+## Set your presence
+
+If you have installed and started the server probably you should find the "Anime Presence" tab at [http://127.0.0.1:8000](http://127.0.0.1:8000).
+
+Here you can specify the following values:
+
+- Anime name
+- Current episode
+- Total episodes
+- Season
+- AniList link
+- Stream-Hoster
+
+You need to provide at least the anime name or current episode or season number.
+
+Beside these values you also have some options to make:
+
+- Use a custom cover image of the anime as rpc logo instead of the stream host logo
+  - If custom cover is enabled, you can set the stream host logo as small image (displayed in the bottom right corner of the rpc logo/large image)
+- Choose between `Playing` and `Watching` as Activity Type
+
+You can view all the settings you make directly in the Live RPC preview:
+
+![Preview: Presence Editor](doc_images/rpc_editor.png)
+
+### Currently Supported Stream-Hoster
+
+- [Crunchyroll](https://www.crunchyroll.com/)
+- [AniWorld](https://aniworld.to/) (Use at own risk)
+
+Coming soon:
+
+- [Amazon Prime Video](https://www.amazon.com/gp/video/storefront)
+- YouTube
+- Netflix
+
+If you want support for other hosters, feel free to create an feature request in the [issue](https://github.com/Revox179/Anime-Discord-RPC/issues) tab of this repository.
+
+## Advantages of the Firefox addon
+
+If you have [installed](#install-additional-firefox-addon) the addon, you can open the extension popup by clicking on the addon within the extension icon of the browser bar:
+
+![open extension popup](doc_images/open_extension_popup.png)
+
+> *Tip: You can permanently add the extension's pop-up icon to your browser bar by selecting the gear icon next to the extension (see image above) and activating ‘Pin to Toolbar’.*
+
+After opening the addon you should get a live rich presence preview where you can change the values below of it and a bunch of options in the settings tab (open it by clicking the gear icon in the top right corner):
+
+![popup showcase](doc_images/popup_showcase.png)
+
+Beside the live preview with the input fields to change it you may already found the option of auto rpc in the settings. This means the automatically detection of what you're watching.
+
+In detail, if you open for example [crunchyroll.com](https://www.crunchyroll.com) and start watching anime there, the addon should automatically recognise this and start the rich presence with the values of the anime you are watching.
+
+You can disable this behaviour by going to `Extension Popup` > `Settings` > `Auto-RPC` and disable the option `Enable Auto RPC`. You also have the option to disable, that the addon should use the stream host you are watching on right now. It will use the selected stream host from the extension popup instead.
+
+In the extension pop-up, you will also notice the 3 buttons at the bottom. The red left button stops the current rich presence (regardless of whether it comes from auto rpc or was started manually). With the middle button you can synchronise your rich presence values in the popup with the current data of the automatic rich presence. Use the green right button to start your rich presence with the values you have specified.
+
+In most cases the addon will give you an error message if something is wrong:
+
+Error | Meaning
+--- | ---
+**`ERROR LOADING COVER`** | This message appears if you have enabled `Use Cover-Image` in the 'RPC Settings' tab and the addon fails to load a cover image for your current anime. This could be due to an internet connection issue or because no cover image is available for the specified anime name.
+**`STORAGE ERROR`** | This error appears when there is an issue with the extension storage, such as when the values for your rich presence cannot be saved or loaded correctly.
+**`NO DATA AVAILABLE`** | This error occurs when you attempt to synchronize your rich presence values in the popup with the latest automatic rich presence data, but no data is found. This might happen if you haven't watched anime on any of the [supported streaming hosts](#currently-supported-stream-hoster) since installing the addon.
+**`REQUESTING SERVER FAILED`** | The server could not be reached. This is usually because the server is not running. If you start the server again it should work. You can check the server status in the extension settings tab at the `Server` section.
+**`INVALID REQUEST`** | This error occurs when the server responds with something unexpected, which usually shouldn't happen. If you encounter this error, please create a [bug report](https://github.com/Revox179/Anime-Discord-RPC/issues/new/choose).
+**`INTERNAL SERVER ERROR`** | This error indicates that the server is reachable, but an internal issue has occurred. This may be due to incorrect values being entered or Discord being inaccessible.
+
+## How it Works
+
+The project consists of two main parts. The first, and most important, is the rpc bridge server. This is a simple python script, starting a local server using [Flask](https://flask.palletsprojects.com/en/2.3.x/) at the adress `localhost:8000` to provide a GUI to enter your values. It then uses [pypresence](https://github.com/qwertyquerty/pypresence) to communicate with the discord gateway and start, update or stop your rich presence.
+
+> *Hint: The server is only running locally on your device and is not reachable from where other then your device.*
+
+If the server could be started, the address should be accessible in the browser and the start page with the documentation should appear. There are also other pages available. Among others, `localhost:8000/rpc`, which is a feature not yet implemented, but above all the route `http://localhost:8000/rpc_anime`.
+
+Under this route, various options are now available to set and start your individual display for anime, as well as to stop it.
+While you are making settings or changing values, you will see a preview how the result will look (see [Set your presence](#set-your-presence))
+
+### Firedox Add-On
+
+...
+
+## Troubleshoot
+
+...

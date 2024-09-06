@@ -136,3 +136,4 @@ eslint.config.mjs
 .mypy_cache/
 .conda/
 .idea/
+*.ipynb

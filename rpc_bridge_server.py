@@ -27,13 +27,21 @@ shutdown = False
 rpc = None
 
 
-@app.route("/")
-def home():
+def load_readme():
     with open("README.md", "r") as f:
         readme = f.read()
         readme = readme.replace("doc_images/", url_for("serve_image", filename="") + "/")
-        html = markdown.markdown(readme, extensions=["tables", "fenced_code"])
-    return render_template("home.html", readme_content=html)
+        app.config["readme"] = markdown.markdown(
+            readme, extensions=["tables", "fenced_code", "markdown.extensions.toc", "markdown_checklist.extension"]
+        )
+
+
+@app.route("/")
+def home():
+    if "readme" not in app.config:
+        load_readme()
+
+    return render_template("home.html", readme_content=app.config["readme"])
 
 
 @app.route("/doc_images/<path:filename>")
@@ -170,10 +178,10 @@ def check_port(port: int) -> bool:
 
 
 if __name__ == "__main__":
-    # if check_port(PORT):
-    #     print(f"\033[91m[ERROR]:\033[00m Port {PORT} is already in use")
-    #     sys.exit(1)
+    if check_port(PORT):
+        print(f"\033[91m[ERROR]:\033[00m Port {PORT} is already in use")
+        sys.exit(1)
 
     print("\033[92m[INFO]:\033[00m Start Flask server on port 8000")
-    app.run(port=PORT, debug=True)
+    app.run(port=PORT)
     print("\033[91m[STOPPED]:\033[00m Shutdown Server")
