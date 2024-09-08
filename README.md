@@ -65,7 +65,7 @@ See [troubleshoot](#troubleshoot) if you encounter any problems.
 
 ### Build from source
 
-If you want to pack your own executable, first follow all steps in the [above](#install-and-run-server-from-source) example. Then you need to install pyinstaller:
+If you want to pack your own executable, first follow all steps in the [above](#install-and-run-server-from-source) example. Then you need to install [pyinstaller](https://pyinstaller.org/):
 
 ```sh
 python3 -m pip install pyinstaller
