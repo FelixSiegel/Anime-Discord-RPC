@@ -1,0 +1,91 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.8'
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pyinstaller
+      
+      - name: Build with PyInstaller
+        run: |
+          if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
+            pyinstaller \
+              --onefile \
+              --hidden-import=jinja2.runtime \
+              --hidden-import=markdown_checklist.extension \
+              --add-data="templates/*:templates/" \
+              --add-data="static/*:static/" \
+              --add-data="static/img/*:static/img/" \
+              --add-data="static/img/discord_avatars/*:static/img/discord_avatars" \
+              --add-data="static/js/*:static/js" \
+              --add-data="doc_images/*:doc_images/" \
+              --add-data="README.md:." \
+              rpc_bridge_server.py
+          elif [[ "${{ matrix.os }}" == "windows-latest" ]]; then
+            pyinstaller \
+              --onefile \
+              --hidden-import=jinja2.runtime \
+              --hidden-import=markdown_checklist.extension \
+              --add-data="templates/*;templates/" \
+              --add-data="static/*;static/" \
+              --add-data="static/img/*;static/img/" \
+              --add-data="static/img/discord_avatars/*;static/img/discord_avatars" \
+              --add-data="static/js/*;static/js" \
+              --add-data="doc_images/*;doc_images/" \
+              --add-data="README.md;." \
+              rpc_bridge_server.py
+          else
+            # MacOS build command
+            pyinstaller \
+              --onefile \
+              --hidden-import=jinja2.runtime \
+              --hidden-import=markdown_checklist.extension \
+              --add-data="templates/*:templates/" \
+              --add-data="static/*:static/" \
+              --add-data="static/img/*:static/img/" \
+              --add-data="static/img/discord_avatars/*:static/img/discord_avatars" \
+              --add-data="static/js/*:static/js" \
+              --add-data="doc_images/*:doc_images/" \
+              --add-data="README.md:." \
+              rpc_bridge_server.py
+          fi
+
+      - name: Create Tag
+        id: tag_version
+        run: |
+          TAG_NAME="v$(date +'%Y.%m.%d.%H%M')"
+          echo "TAG_NAME=${TAG_NAME}" >> $GITHUB_ENV
+          git tag $TAG_NAME
+          git push origin $TAG_NAME
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ env.TAG_NAME }}
+          files: |
+            dist/rpc_bridge_server
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
