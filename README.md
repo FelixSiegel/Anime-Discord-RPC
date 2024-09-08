@@ -1,8 +1,20 @@
 # Anime Discord RPC
 
+[![Python](https://img.shields.io/badge/Made_with-Python-green)](https://www.python.org/)
+[![Checked with mypy](https://www.mypy-lang.org/static/mypy_badge.svg)](https://mypy-lang.org/)
+[![Linting: Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/charliermarsh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
+[![License: MPL 2.0](https://img.shields.io/badge/License-MPL_2.0-brightgreen.svg)](https://opensource.org/licenses/MPL-2.0)
+
 Show everyone on discord which anime you are watching with just a few clicks and a few buttons. With an optional browser add-on, you have the option of automatically recognising what you are currently viewing*.
 
 *\*Due to discord-side limitations, the browser addon cannot run on its own and still requires the local server as a bridge device. Read more about it in [how it works](#how-it-works).*
+
+## Build using
+
+[![Flask](https://img.shields.io/badge/flask-%23000.svg?style=for-the-badge&logo=flask&logoColor=white)](https://github.com/pallets/flask)
+[![pypresence](https://img.shields.io/badge/pypresence-00bb88.svg?style=for-the-badge&logo=discord)](https://github.com/qwertyquerty/pypresence)
+[![pypresence](https://img.shields.io/badge/AniList_Api-02a8fe.svg?style=for-the-badge&logo=anilist&logoColor=white)](https://github.com/AniList/ApiV2-GraphQL-Docs)
+[![python-markdown](https://img.shields.io/badge/python--markdown-ffffff.svg?style=for-the-badge&logo=markdown&logoColor=black)](https://github.com/Python-Markdown/markdown)
 
 ## Features
 
@@ -92,8 +104,8 @@ You can view all the settings you make directly in the Live RPC preview:
 Coming soon:
 
 - [Amazon Prime Video](https://www.amazon.com/gp/video/storefront)
-- YouTube
-- Netflix
+- [YouTube](https://www.youtube.com/)
+- [Netflix](https://www.netflix.com/)
 
 If you want support for other hosters, feel free to create an feature request in the [issue](https://github.com/Revox179/Anime-Discord-RPC/issues) tab of this repository.
 
@@ -117,7 +129,11 @@ You can disable this behaviour by going to `Extension Popup` > `Settings` > `Aut
 
 In the extension pop-up, you will also notice the 3 buttons at the bottom. The red left button stops the current rich presence (regardless of whether it comes from auto rpc or was started manually). With the middle button you can synchronise your rich presence values in the popup with the current data of the automatic rich presence. Use the green right button to start your rich presence with the values you have specified.
 
-In most cases the addon will give you an error message if something is wrong:
+In most cases the addon will give you an error message if something is wrong, see [error messages](#error-messages).
+
+## Error messages
+
+The following table include known error messages and describes why they appear. If this does not solve the problem for you, feel free to create a [bug report](https://github.com/Revox179/Anime-Discord-RPC/issues/new/choose).
 
 Error | Meaning
 --- | ---
@@ -137,12 +153,36 @@ The project consists of two main parts. The first, and most important, is the rp
 If the server could be started, the address should be accessible in the browser and the start page with the documentation should appear. There are also other pages available. Among others, `localhost:8000/rpc`, which is a feature not yet implemented, but above all the route `http://localhost:8000/rpc_anime`.
 
 Under this route, various options are now available to set and start your individual display for anime, as well as to stop it.
-While you are making settings or changing values, you will see a preview how the result will look (see [Set your presence](#set-your-presence))
+While you are making settings or changing values, you will see a preview how the result will look (see [Set your presence](#set-your-presence)).
 
-### Firedox Add-On
-
-...
+The AddOn also requires this server. The reason is that in order to initiate Discord Rich Presence, it must communicate with the Discord IPC gateway. This is only possible if the Discord app is running locally and can directly connect to the gateway. Currently, Discord does not allow starting RPC through the browser. This means that if you're using Discord in the browser, there is no IPC gateway to communicate with, and the browser cannot interact with the local Discord gateway (because, for security reasons, browsers do not allow communication with locally running processes). Therefore, a local web server is needed to act as a "bridge" to the Discord gateway.
 
 ## Troubleshoot
 
-...
+***My server won't start?***
+
+In case your server wont start and you use the executable file, try starting it using the command line to get more details, what is going wrong. Run this command inside the folder where your executable is located:
+
+```sh
+# Linux
+./rpc_bridge_server
+
+# Windows
+start rpc_bridge_server.exe
+```
+
+---
+
+***My server is running, but it gives me an error response when trying to start the presence?***
+
+If you get an error message when starting/updating your presence, take a look at the table in [error messages](#error-messages) for more informations.
+
+---
+
+***The anilist button does'nt show up in my discord profile?***
+
+This is a known bug of discord. The button is actually there and others will see it, expect your self. Try asking a friend if he can see it. If he also can't see it feel free to create a [bug report](https://github.com/Revox179/Anime-Discord-RPC/issues/new/choose).
+
+---
+
+Still have problems? Feel free to create a [bug report](https://github.com/Revox179/Anime-Discord-RPC/issues/new/choose).
