@@ -6,6 +6,7 @@ Created on Tue Sep 20 18:40:56 2022
 @author: Revox179
 """
 
+import os
 import sys
 import time
 import socket
@@ -28,7 +29,16 @@ rpc = None
 
 
 def load_readme():
-    with open("README.md", "r") as f:
+    if getattr(sys, 'frozen', False):
+        # running in a bundle (e.g. pyinstaller executable)
+        base_path = sys._MEIPASS
+    else:
+        # running in a normal Python environment
+        base_path = os.path.dirname(__file__)
+
+    readme_path = os.path.join(base_path, "README.md")
+
+    with open(readme_path, "r") as f:
         readme = f.read()
         readme = readme.replace("doc_images/", url_for("serve_image", filename="") + "/")
         app.config["readme"] = markdown.markdown(

@@ -63,6 +63,31 @@ You can now go to [http://127.0.0.1:8000](http://127.0.0.1:8000) in your browser
 
 See [troubleshoot](#troubleshoot) if you encounter any problems.
 
+### Build from source
+
+If you want to pack your own executable, first follow all steps in the [above](#install-and-run-server-from-source) example. Then you need to install pyinstaller:
+
+```sh
+python3 -m pip install pyinstaller
+```
+
+Now run the following command inside the root directory of the project:
+
+```sh
+pyinstaller \
+--onefile \
+--hidden-import=jinja2.runtime \
+--hidden-import=markdown_checklist.extension \
+--add-data="templates/*:templates/" \
+--add-data="static/*:static/" \
+--add-data="static/img/*:static/img/" \
+--add-data="static/img/discord_avatars/*:static/img/discord_avatars" \
+--add-data="static/js/*:static/js" \
+--add-data="doc_images/*:doc_images/" \
+--add-data="README.md:." \
+rpc_bridge_server.py
+```
+
 ### Install additional Firefox-AddOn
 
 This step is optional but offers some useful features like automatic recognition if you watch anime in your browser. See [Advantages of the Firefox addon](#advantages-of-the-firefox-addon).
