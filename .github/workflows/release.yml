@@ -34,7 +34,8 @@ jobs:
         if: startsWith(matrix.os, 'ubuntu') || startsWith(matrix.os, 'macos')
         shell: bash
         run: |
-          DATE=$(date +'%Y-%m-%d-%H%M')
+          DATE=$(date +'%Y-%m-%d')
+          COMMIT_HASH=$(git rev-parse --short HEAD)
 
           if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
             OS_NAME="linux"
@@ -42,7 +43,7 @@ jobs:
             OS_NAME="macos"
           fi
 
-          EXECUTABLE_NAME="${OS_NAME}_${DATE}"
+          EXECUTABLE_NAME="${OS_NAME}_rpc-bridge_${DATE}-${COMMIT_HASH}"
           echo "Building executable with name: $EXECUTABLE_NAME"
 
           pyinstaller \
@@ -64,7 +65,8 @@ jobs:
         shell: powershell
         run: |
           $DATE = Get-Date -Format "yyyy-MM-dd-HHmm"
-          $EXECUTABLE_NAME = "windows_$DATE.exe"
+          $COMMIT_HASH = (git rev-parse --short HEAD)
+          $EXECUTABLE_NAME = "windows_rpc-bridge_$DATE-$COMMIT_HASH.exe"
           Write-Host "Building executable with name: $EXECUTABLE_NAME"
 
           pyinstaller --onefile `
@@ -115,7 +117,7 @@ jobs:
       - name: Create Tag
         id: tag_version
         run: |
-          TAG_NAME="v$(date +'%Y.%m.%d.%H%M')"
+          TAG_NAME="v$(date +'%Y.%m.%d')-$(git rev-parse --short HEAD)"
           echo "TAG_NAME=${TAG_NAME}" >> $GITHUB_ENV
           git tag $TAG_NAME
           git push origin $TAG_NAME
