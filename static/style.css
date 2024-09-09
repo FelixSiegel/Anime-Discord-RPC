@@ -103,11 +103,10 @@ ul.checklist > li {
 .menu-header img {
     height: 40px;
     width: 40px;
-    border-radius: 50%;
 }
 
 .menu-header div {
-    margin-left: 2rem;
+    margin-left: 1rem;
     width: 100%;
     height: min-content;
     font-size: 24px;
@@ -167,7 +166,7 @@ ul.checklist > li {
     color: #d1d1d1;
 }
 
-.content-field img {
+.markdown-section img:not(a img) {
     max-width: 100%;
     max-height: 100%;
     border-radius: 8px;
@@ -227,7 +226,7 @@ ul.checklist > li {
 }
 
 .avatar-image {
-    background-image: url("/static/img/discord_avatars/1.png");
+    background-color: #757e8a;
     width: 100%;
     height: 100%;
     background-size: 100%;

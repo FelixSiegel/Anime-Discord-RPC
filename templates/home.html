@@ -6,14 +6,14 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Discord Anime RPC</title>
-    <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}" type="image/x-icon">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="shortcut icon" href="static/img/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="static/style.css">
 </head>
 
 <body>
     <div class="menu-bar">
         <div class="menu-header">
-            <img src="{{ url_for('static', filename='img/discord_avatars/0.png') }}">
+            <img src="static/img/discord-mark-blue.svg">
             <div>Discord RPC</div>
         </div>
         <div class="menu-itemlist">
@@ -23,7 +23,7 @@
             <a class="menu-item shutdown" href="/exit">Exit Server</a>
         </div>
     </div>
-    <div class="content-field">
+    <div class="content-field markdown-section">
         {{ readme_content|safe }}
     </div>
 </body>

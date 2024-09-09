@@ -6,14 +6,14 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Discord Anime RPC</title>
-    <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}" type="image/x-icon">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="shortcut icon" href="static/img/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="static/style.css">
 </head>
 
 <body>
     <div class="menu-bar">
         <div class="menu-header">
-            <img src="{{ url_for('static', filename='img/discord_avatars/0.png') }}">
+            <img src="static/img/discord-mark-blue.svg">
             <div>Discord RPC</div>
         </div>
         <div class="menu-itemlist">
@@ -29,7 +29,7 @@
                 <div class="profile-banner"></div>
                 <div class="avatar-holder">
                     <div class="avatar-box">
-                        <div class="avatar-image"></div>
+                        <img class="avatar-image" src="static/img/discord_avatar.png">
                         <div class="avatar-onlinestatus"></div>
                     </div>
                 </div>
@@ -47,8 +47,8 @@
                             <div class="activity-header">playing a game</div>
                             <div class="activity-body">
                                 <div id="asset_holder" class="activity-asset">
-                                    <img id="aniworld_logo" src="{{ url_for('static', filename='img/aniworld.png') }}" title="Logo">
-                                    <img id="crunchyroll_logo" src="{{ url_for('static', filename='img/crunchyroll.png') }}" title="Logo" style="display: none;">
+                                    <img id="aniworld_logo" src="static/img/aniworld.png" title="Logo">
+                                    <img id="crunchyroll_logo" src="static/img/crunchyroll.png" title="Logo" style="display: none;">
                                 </div>
                                 <div class="activity-infobox">
                                     <div class="activity-info" id="host_name">Aniworld</div>
@@ -117,7 +117,7 @@
                         <div class="message-content clear">Cleared!</div>
                         <div class="message-triangle clear">
                             <img class="clear"
-                                src="{{ url_for('static', filename='img/triangle-down.svg') }}">
+                                src="static/img/triangle-down.svg">
                         </div>
                     </div>
                     <div class="value-button" style="background-color: #cf0000;" id="clear_btn">Clear</div>
@@ -127,7 +127,7 @@
                         <div class="message-content update">Updated!</div>
                         <div class="message-triangle update">
                             <img class="update"
-                                src="{{ url_for('static', filename='img/triangle-down.svg') }}">
+                                src="static/img/triangle-down.svg">
                         </div>
                     </div>
                     <div class="value-button" style="background-color: #00a500;" id="update_btn">Update</div>
@@ -136,7 +136,7 @@
             </div>
         </div>
     </div>
-    <script src="{{ url_for('static', filename='js/rpc_anime.js') }}"></script>
+    <script src="static/js/rpc_anime.js"></script>
 </body>
 
 </html>
