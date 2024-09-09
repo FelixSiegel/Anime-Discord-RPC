@@ -16,12 +16,13 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.8'
+          python-version: '3.11'
+          cache: 'pip'
 
       - name: Install dependencies
         run: |
@@ -80,7 +81,7 @@ jobs:
             rpc_bridge_server.py
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: executable-${{ matrix.os }}
           path: dist/*
@@ -91,22 +92,22 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Download all artifacts (Windows)
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: executable-windows-latest
           path: ./windows/
 
       - name: Download all artifacts (Ubuntu)
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: executable-ubuntu-latest
           path: ./ubuntu/
 
       - name: Download all artifacts (MacOS)
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: executable-macos-latest
           path: ./macos/
@@ -120,7 +121,7 @@ jobs:
           git push origin $TAG_NAME
 
       - name: Create Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.TAG_NAME }}
           files: |
