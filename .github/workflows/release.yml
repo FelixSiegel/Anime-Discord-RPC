@@ -50,17 +50,16 @@ jobs:
         if: startsWith(matrix.os, 'windows')
         shell: powershell  # Use PowerShell explicitly for Windows
         run: |
-          pyinstaller \
-            --onefile \
-            --hidden-import=jinja2.runtime \
-            --hidden-import=markdown_checklist.extension \
-            --add-data="templates/*;templates/" \
-            --add-data="static/*;static/" \
-            --add-data="static/img/*;static/img/" \
-            --add-data="static/img/discord_avatars/*;static/img/discord_avatars" \
-            --add-data="static/js/*;static/js" \
-            --add-data="doc_images/*;doc_images/" \
-            --add-data="README.md;." \
+          pyinstaller --onefile `
+            --hidden-import=jinja2.runtime `
+            --hidden-import=markdown_checklist.extension `
+            --add-data="templates/*;templates/" `
+            --add-data="static/*;static/" `
+            --add-data="static/img/*;static/img/" `
+            --add-data="static/img/discord_avatars/*;static/img/discord_avatars" `
+            --add-data="static/js/*;static/js" `
+            --add-data="doc_images/*;doc_images/" `
+            --add-data="README.md;." `
             rpc_bridge_server.py
 
       - name: Upload artifact
