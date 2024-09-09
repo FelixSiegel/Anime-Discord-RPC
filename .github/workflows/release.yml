@@ -33,8 +33,20 @@ jobs:
         if: startsWith(matrix.os, 'ubuntu') || startsWith(matrix.os, 'macos')
         shell: bash
         run: |
+          DATE=$(date +'%Y-%m-%d-%H%M')
+
+          if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
+            OS_NAME="linux"
+          else
+            OS_NAME="macos"
+          fi
+
+          EXECUTABLE_NAME="${OS_NAME}_${DATE}"
+          echo "Building executable with name: $EXECUTABLE_NAME"
+
           pyinstaller \
             --onefile \
+            --name $EXECUTABLE_NAME \
             --hidden-import=jinja2.runtime \
             --hidden-import=markdown_checklist.extension \
             --add-data="templates/*:templates/" \
@@ -50,7 +62,12 @@ jobs:
         if: startsWith(matrix.os, 'windows')
         shell: powershell
         run: |
+          $DATE = Get-Date -Format "yyyy-MM-dd-HHmm"
+          $EXECUTABLE_NAME = "windows_$DATE.exe"
+          Write-Host "Building executable with name: $EXECUTABLE_NAME"
+
           pyinstaller --onefile `
+            --name $EXECUTABLE_NAME `
             --hidden-import=jinja2.runtime `
             --hidden-import=markdown_checklist.extension `
             --add-data="templates/*;templates/" `
@@ -62,22 +79,11 @@ jobs:
             --add-data="README.md;." `
             rpc_bridge_server.py
 
-      - name: List uploaded artifacts (debugging)
-        run: ls dist/
-
-      - name: Upload artifact (Linux/macOS)
-        if: startsWith(matrix.os, 'ubuntu') || startsWith(matrix.os, 'macos')
+      - name: Upload artifact
         uses: actions/upload-artifact@v2
         with:
           name: executable-${{ matrix.os }}
-          path: dist/rpc_bridge_server
-
-      - name: Upload artifact (Windows)
-        if: startsWith(matrix.os, 'windows')
-        uses: actions/upload-artifact@v2
-        with:
-          name: executable-${{ matrix.os }}
-          path: dist/rpc_bridge_server.exe
+          path: dist/*
 
   release:
     runs-on: ubuntu-latest
@@ -118,8 +124,8 @@ jobs:
         with:
           tag_name: ${{ env.TAG_NAME }}
           files: |
-            ubuntu/rpc_bridge_server
-            windows/rpc_bridge_server.exe
-            macos/rpc_bridge_server
+            ubuntu/linux_*
+            windows/windows_*.exe
+            macos/macos_*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
