@@ -71,6 +71,7 @@ jobs:
               --add-data="doc_images/*:doc_images/" \
               --add-data="README.md:." \
               rpc_bridge_server.py
+          fi
 
       - name: Upload artifact
         uses: actions/upload-artifact@v2
