@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
 
     strategy:
       matrix:
@@ -71,7 +71,36 @@ jobs:
               --add-data="doc_images/*:doc_images/" \
               --add-data="README.md:." \
               rpc_bridge_server.py
-          fi
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: executable-${{ matrix.os }}
+          path: dist/rpc_bridge_server
+
+  release:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: executable-ubuntu-latest
+          path: ./ubuntu/
+
+      - uses: actions/download-artifact@v2
+        with:
+          name: executable-windows-latest
+          path: ./windows/
+
+      - uses: actions/download-artifact@v2
+        with:
+          name: executable-macos-latest
+          path: ./macos/
 
       - name: Create Tag
         id: tag_version
@@ -86,6 +115,8 @@ jobs:
         with:
           tag_name: ${{ env.TAG_NAME }}
           files: |
-            dist/rpc_bridge_server
+            ubuntu/rpc_bridge_server
+            windows/rpc_bridge_server.exe
+            macos/rpc_bridge_server
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
