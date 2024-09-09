@@ -31,7 +31,7 @@ jobs:
 
       - name: Build with PyInstaller (Linux/macOS)
         if: startsWith(matrix.os, 'ubuntu') || startsWith(matrix.os, 'macos')
-        shell: bash  # Use bash explicitly for Linux/macOS
+        shell: bash
         run: |
           pyinstaller \
             --onefile \
@@ -48,7 +48,7 @@ jobs:
 
       - name: Build with PyInstaller (Windows)
         if: startsWith(matrix.os, 'windows')
-        shell: powershell  # Use PowerShell explicitly for Windows
+        shell: powershell
         run: |
           pyinstaller --onefile `
             --hidden-import=jinja2.runtime `
@@ -61,6 +61,9 @@ jobs:
             --add-data="doc_images/*;doc_images/" `
             --add-data="README.md;." `
             rpc_bridge_server.py
+
+      - name: List uploaded artifacts (debugging)
+        run: ls dist/
 
       - name: Upload artifact
         uses: actions/upload-artifact@v2
@@ -76,18 +79,20 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Download all artifacts
+      - name: Download all artifacts (Windows)
+        uses: actions/download-artifact@v2
+        with:
+          name: executable-windows-latest
+          path: ./windows/
+
+      - name: Download all artifacts (Ubuntu)
         uses: actions/download-artifact@v2
         with:
           name: executable-ubuntu-latest
           path: ./ubuntu/
 
-      - uses: actions/download-artifact@v2
-        with:
-          name: executable-windows-latest
-          path: ./windows/
-
-      - uses: actions/download-artifact@v2
+      - name: Download all artifacts (MacOS)
+        uses: actions/download-artifact@v2
         with:
           name: executable-macos-latest
           path: ./macos/
