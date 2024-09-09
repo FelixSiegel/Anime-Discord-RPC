@@ -65,11 +65,19 @@ jobs:
       - name: List uploaded artifacts (debugging)
         run: ls dist/
 
-      - name: Upload artifact
+      - name: Upload artifact (Linux/macOS)
+        if: startsWith(matrix.os, 'ubuntu') || startsWith(matrix.os, 'macos')
         uses: actions/upload-artifact@v2
         with:
           name: executable-${{ matrix.os }}
           path: dist/rpc_bridge_server
+
+      - name: Upload artifact (Windows)
+        if: startsWith(matrix.os, 'windows')
+        uses: actions/upload-artifact@v2
+        with:
+          name: executable-${{ matrix.os }}
+          path: dist/rpc_bridge_server.exe
 
   release:
     runs-on: ubuntu-latest
