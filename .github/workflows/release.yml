@@ -4,6 +4,7 @@ on:
   push:
     tags:
       - 'v[0-9]+.[0-9]+.[0-9]+'
+      - 'v[0-9]+.[0-9]+.[0-9]+-(alpha|beta)'
 
 jobs:
   build:
@@ -108,10 +109,24 @@ jobs:
           name: executable-macos-latest
           path: ./macos/
 
+      - name: Set prerelease flag
+        id: prerelease
+        run: |
+          if [[ "${{ github.ref }}" =~ alpha$ || "${{ github.ref }}" =~ beta$ ]]; then
+            echo "PRERELEASE=true" >> $GITHUB_ENV
+            echo "MAKE_LATEST=false" >> $GITHUB_ENV
+            echo "Creating a prerelease"
+          else
+            echo "PRERELEASE=false" >> $GITHUB_ENV
+            echo "MAKE_LATEST=true" >> $GITHUB_ENV
+            echo "Creating a stable release"
+
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.ref }}
+          prerelease: ${{ env.PRERELEASE }}
+          make_latest: ${{ env.MAKE_LATEST }}
           files: |
             ubuntu/linux_*
             windows/windows_*.exe
