@@ -30,7 +30,7 @@ First of all you need to setup the local server. The server includes the rich pr
 
 ### Install packed server executable
 
-To get the server in one executable file, go to the [release tab](https://github.com/Revox179/Anime-Discord-RPC/releases/latest) and download the file that fits your system:
+To get the server in one executable file, go to the [release tab](https://github.com/FelixSiegel/Anime-Discord-RPC/releases/latest) and download the file that fits your system:
 
 - Windows: `rpc_bridge_server.exe`
 - Linux: `rpc_bridge_server`
@@ -41,7 +41,7 @@ See [troubleshoot](#troubleshoot) if you can't get the server running or your rp
 
 ### Install and run server from source
 
-If you want to run the server from source, you can do this by either downloading the whole project source code or downloading only [`Server_SourceCode.zip`](https://github.com/Revox179/Anime-Discord-RPC/releases/latest/download/DCM_flask-server) and unzip the file. Go to the root directory of the project and install the required python libaries by typing into your terminal:
+If you want to run the server from source, you can do this by either downloading the whole project source code or downloading only [`Server_SourceCode.zip`](https://github.com/FelixSiegel/Anime-Discord-RPC/releases/latest/download/DCM_flask-server) and unzip the file. Go to the root directory of the project and install the required python libaries by typing into your terminal:
 
 ```sh
 python3 -m pip install -r requirements.txt
@@ -132,7 +132,7 @@ Coming soon:
 - [YouTube](https://www.youtube.com/)
 - [Netflix](https://www.netflix.com/)
 
-If you want support for other hosters, feel free to create an feature request in the [issue](https://github.com/Revox179/Anime-Discord-RPC/issues) tab of this repository.
+If you want support for other hosters, feel free to create an feature request in the [issue](https://github.com/FelixSiegel/Anime-Discord-RPC/issues) tab of this repository.
 
 ## Advantages of the Firefox addon
 
@@ -158,7 +158,7 @@ In most cases the addon will give you an error message if something is wrong, se
 
 ## Error messages
 
-The following table include known error messages and describes why they appear. If this does not solve the problem for you, feel free to create a [bug report](https://github.com/Revox179/Anime-Discord-RPC/issues/new/choose).
+The following table include known error messages and describes why they appear. If this does not solve the problem for you, feel free to create a [bug report](https://github.com/FelixSiegel/Anime-Discord-RPC/issues/new/choose).
 
 Error | Meaning
 --- | ---
@@ -166,7 +166,7 @@ Error | Meaning
 **`STORAGE ERROR`** | This error appears when there is an issue with the extension storage, such as when the values for your rich presence cannot be saved or loaded correctly.
 **`NO DATA AVAILABLE`** | This error occurs when you attempt to synchronize your rich presence values in the popup with the latest automatic rich presence data, but no data is found. This might happen if you haven't watched anime on any of the [supported streaming hosts](#currently-supported-stream-hoster) since installing the addon.
 **`REQUESTING SERVER FAILED`** | The server could not be reached. This is usually because the server is not running. If you start the server again it should work. You can check the server status in the extension settings tab at the `Server` section.
-**`INVALID REQUEST`** | This error occurs when the server responds with something unexpected, which usually shouldn't happen. If you encounter this error, please create a [bug report](https://github.com/Revox179/Anime-Discord-RPC/issues/new/choose).
+**`INVALID REQUEST`** | This error occurs when the server responds with something unexpected, which usually shouldn't happen. If you encounter this error, please create a [bug report](https://github.com/FelixSiegel/Anime-Discord-RPC/issues/new/choose).
 **`INTERNAL SERVER ERROR`** | This error indicates that the server is reachable, but an internal issue has occurred. This may be due to incorrect values being entered or Discord being inaccessible.
 
 ## How it Works
@@ -206,8 +206,8 @@ If you get an error message when starting/updating your presence, take a look at
 
 ***The anilist button does'nt show up in my discord profile?***
 
-This is a known bug of discord. The button is actually there and others will see it, expect your self. Try asking a friend if he can see it. If he also can't see it feel free to create a [bug report](https://github.com/Revox179/Anime-Discord-RPC/issues/new/choose).
+This is a known bug of discord. The button is actually there and others will see it, expect your self. Try asking a friend if he can see it. If he also can't see it feel free to create a [bug report](https://github.com/FelixSiegel/Anime-Discord-RPC/issues/new/choose).
 
 ---
 
-Still have problems? Feel free to create a [bug report](https://github.com/Revox179/Anime-Discord-RPC/issues/new/choose).
+Still have problems? Feel free to create a [bug report](https://github.com/FelixSiegel/Anime-Discord-RPC/issues/new/choose).

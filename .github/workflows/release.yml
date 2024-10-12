@@ -2,9 +2,8 @@ name: Release
 
 on:
   push:
-    branches:
-      - main
-  workflow_dispatch:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
 
 jobs:
   build:
@@ -34,16 +33,13 @@ jobs:
         if: startsWith(matrix.os, 'ubuntu') || startsWith(matrix.os, 'macos')
         shell: bash
         run: |
-          DATE=$(date +'%Y-%m-%d')
-          COMMIT_HASH=$(git rev-parse --short HEAD)
-
           if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
             OS_NAME="linux"
           else
             OS_NAME="macos"
           fi
 
-          EXECUTABLE_NAME="${OS_NAME}_rpc-bridge_${DATE}-${COMMIT_HASH}"
+          EXECUTABLE_NAME="${OS_NAME}_rpc-bridge_${{ github.ref }}"
           echo "Building executable with name: $EXECUTABLE_NAME"
 
           pyinstaller \
@@ -64,9 +60,7 @@ jobs:
         if: startsWith(matrix.os, 'windows')
         shell: powershell
         run: |
-          $DATE = Get-Date -Format "yyyy-MM-dd-HHmm"
-          $COMMIT_HASH = (git rev-parse --short HEAD)
-          $EXECUTABLE_NAME = "windows_rpc-bridge_$DATE-$COMMIT_HASH.exe"
+          $EXECUTABLE_NAME = "windows_rpc-bridge_${{ github.ref }}.exe"
           Write-Host "Building executable with name: $EXECUTABLE_NAME"
 
           pyinstaller --onefile `
@@ -114,18 +108,10 @@ jobs:
           name: executable-macos-latest
           path: ./macos/
 
-      - name: Create Tag
-        id: tag_version
-        run: |
-          TAG_NAME="v$(date +'%Y.%m.%d')-$(git rev-parse --short HEAD)"
-          echo "TAG_NAME=${TAG_NAME}" >> $GITHUB_ENV
-          git tag $TAG_NAME
-          git push origin $TAG_NAME
-
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ env.TAG_NAME }}
+          tag_name: ${{ github.ref }}
           files: |
             ubuntu/linux_*
             windows/windows_*.exe
