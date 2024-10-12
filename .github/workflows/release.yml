@@ -52,7 +52,6 @@ jobs:
             --add-data="templates/*:templates/" \
             --add-data="static/*:static/" \
             --add-data="static/img/*:static/img/" \
-            --add-data="static/img/discord_avatars/*:static/img/discord_avatars" \
             --add-data="static/js/*:static/js" \
             --add-data="doc_images/*:doc_images/" \
             --add-data="README.md:." \
@@ -72,7 +71,6 @@ jobs:
             --add-data="templates/*;templates/" `
             --add-data="static/*;static/" `
             --add-data="static/img/*;static/img/" `
-            --add-data="static/img/discord_avatars/*;static/img/discord_avatars" `
             --add-data="static/js/*;static/js" `
             --add-data="doc_images/*;doc_images/" `
             --add-data="README.md;." `
