@@ -119,6 +119,7 @@ jobs:
             echo "PRERELEASE=false" >> $GITHUB_ENV
             echo "MAKE_LATEST=true" >> $GITHUB_ENV
             echo "Creating a stable release"
+          fi
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
