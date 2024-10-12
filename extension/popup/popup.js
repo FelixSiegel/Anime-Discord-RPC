@@ -27,7 +27,11 @@ function update_anime_state(state, timeout = 800) {
 
         }).catch(storage_err)
     } else {
-        document.getElementById("anime_value").innerText = "Watching " + state;
+        if (document.getElementById("presence_activity").getAttribute("data-ptype") === "watching") {
+            document.getElementById("anime_value").innerText = state;
+        } else {
+            document.getElementById("anime_value").innerText = "Watching " + state;
+        }
 
         browser.storage.local.get('rpc_logo').then((item) => {
             if (item.rpc_logo !== 'enabled') { return; }
@@ -190,6 +194,45 @@ function update_discord_name(type, value) {
     }
 }
 
+/**
+ * Update the activity type switch, rpc preview and storage with the given type. If the type is undefined, the function
+ * will set the activity type to "watching" and update the storage accordingly.
+ *
+ * @param {String|undefined} type - Type of the activity. Can be "watching" or "playing". Default to "watching".
+ * @returns {void}
+ */
+function update_activity_type(type) {
+    if (type === undefined) { type = "watching"; }
+
+    browser.storage.local.set({ "activity_type": type })
+        .then(() => storage_log("activity_type", type))
+        .catch(storage_err);
+
+    const presence_activity = document.getElementById("presence_activity");
+
+    if (type === 'watching') {
+        document.getElementById("switch_watchingType").classList.add("switch-active");
+        document.getElementById("switch_playingType").classList.remove("switch-active");
+
+        presence_activity.innerText = `Watching ${document.getElementById("cur_host").innerText}`;
+        presence_activity.setAttribute("data-ptype", "watching");
+
+        document.getElementById("host_name").classList.replace("activity-title", "hidden");
+        document.getElementById("anime_value").classList.add("activity-title");
+        document.getElementById("anime_value").innerText = document.getElementById("anime_input").value;
+    } else {
+        document.getElementById("switch_playingType").classList.add("switch-active");
+        document.getElementById("switch_watchingType").classList.remove("switch-active");
+
+        presence_activity.innerText = `Playing a Game`;
+        presence_activity.setAttribute("data-ptype", "playing");
+
+        document.getElementById("host_name").classList.replace("hidden", "activity-title");
+        document.getElementById("anime_value").classList.remove("activity-title");
+        document.getElementById("anime_value").innerText = "Watching " + document.getElementById("anime_input").value;
+    }
+}
+
 
 // Functions for menu control functionality
 
@@ -235,6 +278,16 @@ function change_host(element, storage_update = false) {
     browser.storage.local.set({ "hostname": element.id })
         .then(() => storage_log("hostname", element.id))
         .catch(storage_err);
+
+    switch (document.getElementById("presence_activity").getAttribute("data-ptype")) {
+        case "watching":
+            document.getElementById("presence_activity").innerText = `Watching ${element.innerText}`;
+            break;
+
+        default:
+            document.getElementById("presence_activity").innerText = `Playing a Game`;
+            break;
+    }
 
     document.querySelector(".item-selected").classList.remove("item-selected")
     element.classList.add("item-selected");
@@ -420,6 +473,7 @@ function update_from_storage(element, value) {
 function update_session() {
     browser.storage.local.get().then((item) => {
         change_host(document.getElementById(item.hostname), true);
+        update_activity_type(item.activity_type);
         update_from_storage("anime_input", item.anime);
         update_from_storage("cur_ep_inp", item.current_episode);
         update_from_storage("total_ep_inp", item.total_episodes);
@@ -514,7 +568,7 @@ document.getElementById("stop_btn").addEventListener("click", () => {
                 // if Process is true -> request was successful
                 show_message("Stopped!", "#5865f2");
             } else {
-                // Process is false (not true)
+                // Process is false
                 show_message("invalid request!", "red");
             }
         }
@@ -562,6 +616,7 @@ document.getElementById("update_btn").addEventListener("click", () => {
         details: document.getElementById("anime_value").innerText,
         state: document.getElementById("progress").innerText.replace("\n", ""),
         anilist: document.getElementById("anilist_link").value,
+        activity_type: document.getElementById("presence_activity").getAttribute("data-ptype") || "watching"
     }
 
     if (document.getElementById("cover_image").src.startsWith('https://')) {
@@ -594,7 +649,7 @@ document.getElementById("update_btn").addEventListener("click", () => {
                 // if Process is true -> request was successful
                 show_message("Updated!", "#5865f2")
             } else {
-                // Process is false (not true)
+                // Process is false
                 show_message("invalid request!", "red")
             }
         }
@@ -668,6 +723,13 @@ document.getElementById("rpc_smallimage").addEventListener("click", () => {
         }
     ).catch(storage_err)
 });
+
+
+// Apply click event handlers for switching buttons in settings menu
+
+document.getElementById("switch_watchingType").addEventListener("click", () => { update_activity_type("watching") });
+
+document.getElementById("switch_playingType").addEventListener("click", () => { update_activity_type("playing") });
 
 
 // Apply event handlers for menu control

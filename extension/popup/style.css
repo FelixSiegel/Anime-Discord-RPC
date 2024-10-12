@@ -186,7 +186,7 @@ html {
     overflow: hidden;
 }
 
-#host_name {
+.activity-title {
     font-weight: 600;
 }
 
@@ -461,6 +461,41 @@ html {
     align-items: center;
     color: #f6f6f7;
     margin: 5px 0px;
+}
+
+.switch {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+}
+
+.left-switch,
+.right-switch {
+    text-align: center;
+    width: 30%;
+    padding: 2px 10px;
+    font-size: 12px;
+    line-height: 16px;
+    color: #fff;
+    border: 1px #4f545c solid;
+    background-color: #35383d;
+    cursor: pointer;
+    user-select: none;
+}
+
+.left-switch {
+    border-radius: 999px 0 0 999px;
+}
+
+.right-switch {
+    border-radius: 0 999px 999px 0;
+}
+
+.switch-active {
+    background-color: #4f545c;
 }
 
 .settings-group {

@@ -3,16 +3,18 @@
 """
 Created on Tue Sep 20 18:40:56 2022
 
-@author: Revox179
+@author: InfinityCoding
 """
 
+import os
 import sys
 import time
 import socket
 import asyncio
 
-from pypresence import Presence
-from flask import Flask, render_template, jsonify, request
+import markdown
+from pypresence import Presence, ActivityType
+from flask import Flask, render_template, jsonify, request, url_for, send_from_directory
 from flask_cors import CORS
 
 PORT = 8000
@@ -26,9 +28,35 @@ shutdown = False
 rpc = None
 
 
+def load_readme():
+    if getattr(sys, 'frozen', False):
+        # running in a bundle (e.g. pyinstaller executable)
+        base_path = sys._MEIPASS
+    else:
+        # running in a normal Python environment
+        base_path = os.path.dirname(__file__)
+
+    readme_path = os.path.join(base_path, "README.md")
+
+    with open(readme_path, "r") as f:
+        readme = f.read()
+        readme = readme.replace("doc_images/", url_for("serve_image", filename="") + "/")
+        app.config["readme"] = markdown.markdown(
+            readme, extensions=["tables", "fenced_code", "markdown.extensions.toc", "markdown_checklist.extension"]
+        )
+
+
 @app.route("/")
 def home():
-    return render_template("home.html")
+    if "readme" not in app.config:
+        load_readme()
+
+    return render_template("home.html", readme_content=app.config["readme"])
+
+
+@app.route("/doc_images/<path:filename>")
+def serve_image(filename):
+    return send_from_directory("doc_images", filename)
 
 
 @app.route("/rpc")
@@ -50,11 +78,12 @@ def rpc_anime():
             args["details"] = result.get("details")
             args["state"] = result.get("state")
             args["start"] = int(time.time())
+            args["activity_type"] = result.get("activity_type")
 
             # if provided, include image and text for large_image else use host as large_image
             if result.get("large_image"):
                 args["large_image"] = result["large_image"]
-                args["large_text"] = "Image by AniList"
+                args["large_text"] = "Cover by AniList"
 
                 if result.get("small_image") == "true":
                     args["small_image"] = result.get("host")
@@ -103,6 +132,7 @@ def rpc_anime():
                     state=args["state"],
                     start=args["start"],
                     buttons=args["buttons"],
+                    activity_type=ActivityType.PLAYING if args["activity_type"] == "playing" else ActivityType.WATCHING,
                 )
                 print(f"\033[92m[INFO]:\033[00m Started Disord RPC with {args['host']}")
 
@@ -118,6 +148,7 @@ def rpc_anime():
                     print("\033[91m[ERROR]:\033[00m No connection to Discord Gateway...")
             else:
                 print("\033[92m[INFO]:\033[00m No known running RPC-Connection to close")
+
         else:
             print("\033[91m[ERROR]:\033[00m Request with no valid/known Type received")
             return jsonify({"processed": "false"})
